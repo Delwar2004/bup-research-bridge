@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-09-26T00:00:00.000Z" agent="Claude" version="24.0.0" type="device">
+  <diagram name="ER Diagram" id="er-diagram-1">
+    <mxGraphModel dx="1800" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Styles reference:
+             entity: rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;fontStyle=1
+             attribute (ellipse): ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;fontColor=#ffffff
+             relationship (diamond): rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2
+             junction entity: rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=1
+        -->
+
+        <!-- Title -->
+        <mxCell id="title1" value="BUP Research Bridge - ER Diagram" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1f3a5f;strokeColor=#4a7fb5;fontColor=#ffffff;fontStyle=1;fontSize=18;" vertex="1" parent="1">
+          <mxGeometry x="440" y="20" width="480" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ================= DEPARTMENT ================= -->
+        <mxCell id="ent_department" value="DEPARTMENT" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="560" y="140" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_dept_id" value="Department_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="440" y="60" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_dept_name" value="Name" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="570" y="60" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_dept_desc" value="Description" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="690" y="60" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_department" target="attr_dept_id"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_department" target="attr_dept_name"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_department" target="attr_dept_desc"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= USER ================= -->
+        <mxCell id="ent_user" value="USER" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="150" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_user_id" value="User_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="30" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_user_name" value="Name" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="75" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_user_email" value="Email" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="120" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_user_pwd" value="Password_Hash" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="165" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_user_role" value="Role" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="210" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_user_status" value="Status" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="255" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_user_created" value="Created_At" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1500" y="300" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_user" target="attr_user_id"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_user" target="attr_user_name"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_user" target="attr_user_email"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_user" target="attr_user_pwd"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_user" target="attr_user_role"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_user" target="attr_user_status"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_user" target="attr_user_created"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= STUDENT ================= -->
+        <mxCell id="ent_student" value="STUDENT" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="190" y="270" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_stu_id" value="Student_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="20" y="195" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_stu_name" value="Name" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="20" y="240" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_stu_email" value="Email" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="20" y="285" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_stu_batch" value="Batch" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="20" y="330" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_stu_photo" value="Profile_Photo" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="10" y="375" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_student" target="attr_stu_id"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e12" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_student" target="attr_stu_name"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_student" target="attr_stu_email"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e14" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_student" target="attr_stu_batch"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e15" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_student" target="attr_stu_photo"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= FACULTY ================= -->
+        <mxCell id="ent_faculty" value="FACULTY" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="620" y="270" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_fac_id" value="Faculty_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="400" y="190" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_fac_name" value="Name" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="400" y="235" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_fac_email" value="Email" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="400" y="280" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_fac_desig" value="Designation" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="390" y="325" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_fac_photo" value="Profile_Photo" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="390" y="370" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_fac_mentor" value="Mentoring_Availability" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="370" y="415" width="150" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_faculty" target="attr_fac_id"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e17" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_faculty" target="attr_fac_name"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e18" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_faculty" target="attr_fac_email"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e19" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_faculty" target="attr_fac_desig"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e20" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_faculty" target="attr_fac_photo"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e21" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_faculty" target="attr_fac_mentor"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= ALUMNI ================= -->
+        <mxCell id="ent_alumni" value="ALUMNI" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="950" y="270" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_alum_id" value="Alumni_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="150" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_alum_name" value="Name" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="195" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_alum_email" value="Email" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="240" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_alum_batch" value="Batch" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="285" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_alum_org" value="Current_Organization" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="330" width="140" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_alum_photo" value="Profile_Photo" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="375" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_alum_mentor" value="Mentoring_Availability" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="420" width="150" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e22" style="edgeStyle=none;html=1;strokeColor=#6a4f7f;" edge="1" parent="1" source="ent_alumni" target="attr_alum_id"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e23" style="edgeStyle=none;html=1;strokeColor=#6a4f7f;" edge="1" parent="1" source="ent_alumni" target="attr_alum_name"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e24" style="edgeStyle=none;html=1;strokeColor=#6a4f7f;" edge="1" parent="1" source="ent_alumni" target="attr_alum_email"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e25" style="edgeStyle=none;html=1;strokeColor=#6a4f7f;" edge="1" parent="1" source="ent_alumni" target="attr_alum_batch"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e26" style="edgeStyle=none;html=1;strokeColor=#6a4f7f;" edge="1" parent="1" source="ent_alumni" target="attr_alum_org"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e27" style="edgeStyle=none;html=1;strokeColor=#6a4f7f;" edge="1" parent="1" source="ent_alumni" target="attr_alum_photo"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e28" style="edgeStyle=none;html=1;strokeColor=#6a4f7f;" edge="1" parent="1" source="ent_alumni" target="attr_alum_mentor"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= NOTIFICATION ================= -->
+        <mxCell id="ent_notif" value="NOTIFICATION" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="530" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_notif_id" value="Notification_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="450" width="120" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_notif_msg" value="Message" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="495" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_notif_type" value="Type" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="540" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_notif_read" value="Is_Read" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="585" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_notif_created" value="Created_At" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#8a6a1f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="630" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e29" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_notif" target="attr_notif_id"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e30" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_notif" target="attr_notif_msg"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e31" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_notif" target="attr_notif_type"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e32" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_notif" target="attr_notif_read"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e33" style="edgeStyle=none;html=1;strokeColor=#8a6a1f;" edge="1" parent="1" source="ent_notif" target="attr_notif_created"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= STUDENT_RESEARCH_AREA (junction) ================= -->
+        <mxCell id="ent_sra" value="STUDENT_RESEARCH_AREA" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="600" width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_sra_stu" value="Student_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="0" y="605" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_sra_area" value="Area_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="10" y="650" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e34" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_sra" target="attr_sra_stu"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e35" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_sra" target="attr_sra_area"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= FACULTY_RESEARCH_AREA (junction) ================= -->
+        <mxCell id="ent_fra" value="FACULTY_RESEARCH_AREA" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="430" y="600" width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_fra_fac" value="Faculty_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="290" y="590" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_fra_area" value="Area_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="320" y="650" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e36" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_fra" target="attr_fra_fac"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e37" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_fra" target="attr_fra_area"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= ALUMNI_RESEARCH_AREA (junction) ================= -->
+        <mxCell id="ent_ara" value="ALUMNI_RESEARCH_AREA" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="900" y="600" width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_ara_alum" value="Alumni_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="590" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_ara_area" value="Area_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#6a4f7f;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="640" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e38" style="edgeStyle=none;html=1;strokeColor=#6a4f7f;" edge="1" parent="1" source="ent_ara" target="attr_ara_alum"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e39" style="edgeStyle=none;html=1;strokeColor=#6a4f7f;" edge="1" parent="1" source="ent_ara" target="attr_ara_area"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= RESEARCH_AREA ================= -->
+        <mxCell id="ent_area" value="RESEARCH_AREA" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="190" y="740" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_area_id" value="Area_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="10" y="745" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_area_name" value="Name" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="10" y="790" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_area_desc" value="Description" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="10" y="835" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e40" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_area" target="attr_area_id"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e41" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_area" target="attr_area_name"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e42" style="edgeStyle=none;html=1;strokeColor=#3f7a5a;" edge="1" parent="1" source="ent_area" target="attr_area_desc"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= THESIS_OPPORTUNITY ================= -->
+        <mxCell id="ent_thesis" value="THESIS_OPPORTUNITY" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="620" y="740" width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_th_id" value="Opportunity_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="900" y="730" width="120" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_th_title" value="Title" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="900" y="775" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_th_desc" value="Description" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="900" y="820" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_th_deadline" value="Deadline" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="900" y="865" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_th_status" value="Status" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="780" y="910" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e43" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_thesis" target="attr_th_id"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e44" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_thesis" target="attr_th_title"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e45" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_thesis" target="attr_th_desc"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e46" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_thesis" target="attr_th_deadline"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e47" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_thesis" target="attr_th_status"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= FACULTY / ALUMNI ================= -->
+        <mxCell id="ent_facalum" value="FACULTY / ALUMNI" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#3f7a5a;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="740" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ================= MENTORSHIP_REQUEST ================= -->
+        <mxCell id="ent_mentreq" value="MENTORSHIP_REQUEST" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="900" width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_mr_id" value="Request_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="860" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_mr_msg" value="Message" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="905" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_mr_status" value="Status" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="950" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_mr_created" value="Created_At" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#2f4f7f;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="995" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e48" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_mentreq" target="attr_mr_id"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e49" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_mentreq" target="attr_mr_msg"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e50" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_mentreq" target="attr_mr_status"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e51" style="edgeStyle=none;html=1;strokeColor=#2f4f7f;" edge="1" parent="1" source="ent_mentreq" target="attr_mr_created"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= RESEARCH_PROJECT ================= -->
+        <mxCell id="ent_rproj" value="RESEARCH_PROJECT" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#a05050;fontColor=#ffffff;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="530" y="920" width="170" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_rp_id" value="Project_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#a05050;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="280" y="880" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_rp_title" value="Title" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#a05050;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="280" y="925" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_rp_desc" value="Description" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#a05050;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="270" y="970" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_rp_type" value="Project_Type" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#a05050;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="260" y="1015" width="120" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_rp_year" value="Year" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#a05050;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="280" y="1060" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_rp_link" value="Link" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#a05050;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="280" y="1105" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e52" style="edgeStyle=none;html=1;strokeColor=#a05050;" edge="1" parent="1" source="ent_rproj" target="attr_rp_id"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e53" style="edgeStyle=none;html=1;strokeColor=#a05050;" edge="1" parent="1" source="ent_rproj" target="attr_rp_title"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e54" style="edgeStyle=none;html=1;strokeColor=#a05050;" edge="1" parent="1" source="ent_rproj" target="attr_rp_desc"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e55" style="edgeStyle=none;html=1;strokeColor=#a05050;" edge="1" parent="1" source="ent_rproj" target="attr_rp_type"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e56" style="edgeStyle=none;html=1;strokeColor=#a05050;" edge="1" parent="1" source="ent_rproj" target="attr_rp_year"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e57" style="edgeStyle=none;html=1;strokeColor=#a05050;" edge="1" parent="1" source="ent_rproj" target="attr_rp_link"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= PROJECT_MEMBER (junction) ================= -->
+        <mxCell id="ent_pm" value="PROJECT_MEMBER" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="560" y="1035" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_pm_proj" value="Project_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="380" y="1120" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_pm_stu" value="Student_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="490" y="1120" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_pm_fac" value="Faculty_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="610" y="1120" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_pm_alum" value="Alumni_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="720" y="1120" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e58" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_pm" target="attr_pm_proj"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e59" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_pm" target="attr_pm_stu"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e60" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_pm" target="attr_pm_fac"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e61" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_pm" target="attr_pm_alum"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= PUBLICATION_AUTHOR (junction) ================= -->
+        <mxCell id="ent_pa" value="PUBLICATION_AUTHOR" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="1035" width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_pa_pub" value="Publication_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="900" y="1000" width="120" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_pa_fac" value="Faculty_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="900" y="1045" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_pa_stu" value="Student_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="1120" width="110" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_pa_fac2" value="Faculty_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="1210" y="1120" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="attr_pa_alum" value="Alumni_ID" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1a1a1a;strokeColor=#9b7fc9;fontColor=#ffffff;fontStyle=4;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="1120" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="e62" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_pa" target="attr_pa_pub"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e63" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_pa" target="attr_pa_fac"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e64" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_pa" target="attr_pa_stu"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e65" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_pa" target="attr_pa_fac2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e66" style="edgeStyle=none;html=1;strokeColor=#9b7fc9;" edge="1" parent="1" source="ent_pa" target="attr_pa_alum"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- ================= RELATIONSHIPS (diamonds) ================= -->
+
+        <!-- has (Department-Student) -->
+        <mxCell id="rel_dept_stu" value="has" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="260" y="185" width="70" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e67" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_department" target="rel_dept_stu"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e68" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_dept_stu" target="ent_student"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- has (Department-Faculty) -->
+        <mxCell id="rel_dept_fac" value="has" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="555" y="205" width="70" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e69" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_department" target="rel_dept_fac"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e70" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_dept_fac" target="ent_faculty"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- has (Department-Alumni) -->
+        <mxCell id="rel_dept_alum" value="has" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="880" y="205" width="70" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e71" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_department" target="rel_dept_alum"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e72" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_dept_alum" target="ent_alumni"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- has profile (Student-Faculty) -->
+        <mxCell id="rel_stu_fac_prof" value="has profile" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="380" y="275" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e73" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_student" target="rel_stu_fac_prof"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e74" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_stu_fac_prof" target="ent_faculty"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- has profile (Faculty-Alumni) -->
+        <mxCell id="rel_fac_alum_prof" value="has profile" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="800" y="275" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e75" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_faculty" target="rel_fac_alum_prof"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e76" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_fac_alum_prof" target="ent_alumni"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- receives (User-Notification) -->
+        <mxCell id="rel_receives" value="receives" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="370" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e77" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_user" target="rel_receives"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e78" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_receives" target="ent_notif"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- interested_in (Student-Student_Research_Area) -->
+        <mxCell id="rel_interested" value="interested_in" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="215" y="440" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e79" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_student" target="rel_interested"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e80" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_interested" target="ent_sra"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- specializes_in (Faculty-Faculty_Research_Area) -->
+        <mxCell id="rel_special" value="specializes_in" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="545" y="440" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e81" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_faculty" target="rel_special"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e82" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_special" target="ent_fra"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- expert_in (Alumni-Alumni_Research_Area) -->
+        <mxCell id="rel_expert" value="expert_in" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="960" y="440" width="90" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e83" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_alumni" target="rel_expert"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e84" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_expert" target="ent_ara"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- creates (Faculty-Thesis_Opportunity) -->
+        <mxCell id="rel_creates" value="creates" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="650" y="530" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e85" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_faculty" target="rel_creates"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e86" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_creates" target="ent_thesis"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- for (Student_Research_Area - Research_Area) -->
+        <mxCell id="rel_for1" value="for" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="215" y="670" width="60" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="e87" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_sra" target="rel_for1"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e88" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_for1" target="ent_area"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- for (Faculty_Research_Area - Research_Area) -->
+        <mxCell id="rel_for2" value="for" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="470" y="670" width="60" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="e89" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_fra" target="rel_for2"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e90" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_for2" target="ent_area"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- for (Alumni_Research_Area - Thesis_Opportunity) -->
+        <mxCell id="rel_for3" value="for" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="960" y="670" width="60" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="e91" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_ara" target="rel_for3"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e92" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_for3" target="ent_thesis"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- categorizes (Research_Area - Thesis_Opportunity) -->
+        <mxCell id="rel_categorizes" value="categorizes" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="450" y="745" width="90" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="e93" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_area" target="rel_categorizes"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e94" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_categorizes" target="ent_thesis"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- owns (Thesis_Opportunity - Research_Project) -->
+        <mxCell id="rel_owns" value="owns" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="675" y="830" width="70" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="e95" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_thesis" target="rel_owns"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e96" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_owns" target="ent_rproj"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- has (Research_Project - Project_Member) -->
+        <mxCell id="rel_has_pm" value="has" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="670" y="995" width="60" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="e97" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_rproj" target="rel_has_pm"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e98" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_has_pm" target="ent_pm"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- sends_request_to (Thesis_Opportunity - Faculty/Alumni) -->
+        <mxCell id="rel_sends" value="sends_request_to" style="rhombus;whiteSpace=wrap;html=1;fillColor=#3a1f1f;strokeColor=#a05050;fontColor=#ffffff;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="785" width="110" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="e99" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="ent_thesis" target="rel_sends"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="e100" value="N" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_sends" target="ent_facalum"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- sends -> mentorship request -->
+        <mxCell id="e101" value="1" style="edgeStyle=none;html=1;strokeColor=#a05050;fontColor=#ffffff;fontSize=14;fontStyle=1;labelBackgroundColor=#000000;startArrow=none;endArrow=none;" edge="1" parent="1" source="rel_sends" target="ent_mentreq"><mxGeometry x="-0.55" relative="1" as="geometry"><mxPoint x="0" y="-10" as="offset" /></mxGeometry></mxCell>
+
+        <!-- Legend / notes -->
+        <mxCell id="legend" value="Legend: Rectangle = Entity | Ellipse = Attribute (underline = key) | Diamond = Relationship" style="text;html=1;fontColor=#ffffff;fontSize=11;fontStyle=2;align=left;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1180" width="600" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
