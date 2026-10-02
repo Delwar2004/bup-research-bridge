@@ -8,6 +8,7 @@ const SessionContext = createContext(null);
 export function SessionProvider({ children }) {
   const [user, setUser] = useState(null);
   const [status, setStatus] = useState('loading');
+  const [loginNotice, setLoginNotice] = useState('');
   const refreshInFlight = useRef(null);
 
   const clearSession = useCallback(() => {
@@ -72,10 +73,20 @@ export function SessionProvider({ children }) {
     };
   }, [clearSession, refreshSession]);
 
+  const applyAccount = useCallback((account) => {
+    setUser(account);
+  }, []);
+
+  const endSession = useCallback((notice = '') => {
+    setLoginNotice(notice);
+    clearSession();
+  }, [clearSession]);
+
   const login = useCallback(async (email, password) => {
     const payload = await authApi.login({ email, password });
     setAccessToken(payload.data.accessToken);
     writeRefreshToken(payload.data.refreshToken);
+    setLoginNotice('');
     setUser(payload.data.user);
     return payload.data.user;
   }, []);
@@ -108,11 +119,14 @@ export function SessionProvider({ children }) {
     user,
     status,
     isAuthenticated: Boolean(user),
+    loginNotice,
+    applyAccount,
+    endSession,
     login,
     register,
     logout,
     logoutEverywhere,
-  }), [user, status, login, register, logout, logoutEverywhere]);
+  }), [user, status, loginNotice, applyAccount, endSession, login, register, logout, logoutEverywhere]);
 
   return (
     <SessionContext.Provider value={value}>

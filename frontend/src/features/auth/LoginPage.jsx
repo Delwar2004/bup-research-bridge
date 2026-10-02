@@ -6,7 +6,7 @@ import { Alert } from '../../components/Alert';
 import { FormField } from '../../components/FormField';
 
 export function LoginPage() {
-  const { login } = useSession();
+  const { login, loginNotice } = useSession();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -37,6 +37,7 @@ export function LoginPage() {
     <section className="panel narrow">
       <h1>Sign in</h1>
       <p>Use the email and password for your BUP Research Bridge account.</p>
+      {loginNotice ? <Alert tone="success">{loginNotice}</Alert> : null}
       {error ? <Alert>{error}</Alert> : null}
       <form onSubmit={onSubmit} noValidate>
         <FormField id="email" label="Email">
