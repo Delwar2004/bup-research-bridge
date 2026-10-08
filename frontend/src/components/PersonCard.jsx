@@ -5,11 +5,23 @@ function departmentLabel(department) {
   return `${department.code} — ${department.name}`;
 }
 
+function initials(name) {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  return parts.slice(0, 2).map((part) => part[0].toUpperCase()).join('') || 'B';
+}
+
 export function PersonCard({ person, href, areaHref }) {
   const areas = person.researchAreas || [];
 
   return (
     <article className="person-card">
+      <div className="person-banner">
+        {person.profilePhotoUrl ? (
+          <img src={person.profilePhotoUrl} alt="" />
+        ) : (
+          <span className="initials" aria-hidden="true">{initials(person.fullName)}</span>
+        )}
+      </div>
       <h2><Link to={href}>{person.fullName}</Link></h2>
       <p className="person-meta">
         {person.role === 'faculty' && person.designation ? `${person.designation} · ` : null}
