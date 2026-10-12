@@ -5,7 +5,7 @@
 | Status | Proposed. Awaiting explicit team approval. |
 | Version | 1.0 |
 | Date | 2 October 2026 |
-| Schema source | `database/migrations/001` through `007` and `database/seed/001_reference_data.sql` on `main` (`d2cc6e8`) |
+| Schema source | `database/migrations/001` through `008` and `database/seed/001_reference_data.sql` |
 | Requirements source | `docs/proposal/BUP_Research_bridge_project_proposal.pdf`, sections 4, 5, and 6 |
 | Implementation | Not started. This document does not add routes, controllers, or SQL. |
 
@@ -19,8 +19,8 @@ The implemented PostgreSQL schema is the structural source of truth. Figure 1 in
 
 BUP Research Bridge is a web platform for the CSE and ICT departments of Bangladesh University of Professionals. The API lets four account roles share one research directory:
 
-- Students discover faculty, alumni, thesis and research opportunities, and previous research work, then request mentorship.
-- Faculty manage a research profile, publications, and thesis or research opportunities, and respond to mentorship.
+- Students discover faculty, alumni, thesis and research opportunities, and previous research work, then request mentorship. They also record publications (including conference papers) and research projects.
+- Faculty manage a research profile, publications (including conference papers), and thesis or research opportunities, and respond to mentorship.
 - Alumni manage a professional profile, experiences, publications, previous research records, and mentorship.
 - Administrators activate accounts, manage role records, moderate content, read activity logs, and read activity reports.
 
@@ -142,13 +142,14 @@ Historical profile rows may remain after a role change. Directory reads use the 
 | Read own account | Yes | Yes | Yes | Yes |
 | Update own profile | Yes | Yes | Yes | Name and email only |
 | Browse active faculty and alumni | Yes | Yes | Yes | Yes |
-| Browse other students | No | No | No | Yes |
+| List active students as author or member candidates | Yes. `id`, name, role, and department only | Yes | Yes | Yes |
+| Browse another student's full profile | No | No | No | Yes, through `/admin/users` |
 | Create opportunity | No | Yes, as owner | No | Yes, for an active faculty owner |
 | Update own opportunity text | No | Owner | No | Any |
 | Change opportunity availability | No | Owner, while role is still `faculty` | No | Any |
-| Submit content for review | No | Own | Own publications and projects | Not required |
+| Submit content for review | Own publications and projects | Own | Own publications and projects | Not required |
 | Moderate content | No | No | No | Yes |
-| Create publication or repository project | No | Yes | Yes | Yes |
+| Create publication or repository project | Yes | Yes | Yes | Yes |
 | Be an author or project member | Yes, if a student profile row exists | Yes | Yes | No. Admin-only accounts fail `fn_assert_academic_profile` |
 | Create mentorship request | Yes | No | No | No |
 | Accept, reject, or complete a request | No | If they are the mentor | If they are the mentor | No |
@@ -415,6 +416,19 @@ Returned by directory and `GET /users/{userId}` for a visible faculty or alumni 
 
 Not included: `email`, `status`, `lastLoginAt`, `passwordHash`.
 
+### 9.3.1 Author or member candidate
+
+Returned only by `GET /students` (PROF-08). This is not a public student profile.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | uuid | `users.id` |
+| `fullName` | string | `users.full_name` |
+| `role` | enum | Always `student` on this route |
+| `department` | department or null | Active student department |
+
+Not included: `email`, `bio`, `profilePhotoUrl`, `batch`, `researchAreas`, `status`.
+
 ### 9.4 Private account
 
 `GET /auth/me` and administrator user detail add:
@@ -594,7 +608,7 @@ The API validates these before insert so clients get `422` instead of an unmappe
 | Approved publication | at least one author and one research area |
 | New opportunity owner | current role `faculty` and status `active` |
 | New opportunity creator | current role `faculty` or `admin`, status `active` |
-| New project or publication creator | current role `faculty`, `alumni`, or `admin`, status `active` |
+| New project or publication creator | current role `student`, `faculty`, `alumni`, or `admin`, status `active` |
 | New mentorship student | current role `student`, status `active`, and a `students` row |
 | New mentorship mentor | current role `faculty` or `alumni`, status `active` |
 | Message sender | `student_user_id` or `mentor_user_id` of that request |
@@ -626,6 +640,7 @@ Enum values sent by clients must match the PostgreSQL labels exactly. No aliases
 | PROF-05 | GET | `/alumni` | Yes | Browse and filter alumni |
 | PROF-06 | GET | `/alumni/{userId}` | Yes | Alumni profile |
 | PROF-07 | GET | `/users/{userId}` | Yes | Authorized profile view |
+| PROF-08 | GET | `/students` | Yes | Active students for author and member pickers |
 | ALUM-01 | GET | `/alumni/{userId}/experiences` | Yes | List shared experiences |
 | ALUM-02 | POST | `/me/experiences` | Yes | Alumni adds an experience |
 | ALUM-03 | PATCH | `/me/experiences/{experienceId}` | Yes | Alumni updates an experience |
@@ -1062,6 +1077,24 @@ Optional query `organization` (string, trimmed 1–200) filters with case-insens
 
 Success `200`: public profile. `404` if the current role is not active `alumni`.
 
+#### PROF-08 List student candidates
+
+| | |
+| --- | --- |
+| Method | `GET` |
+| Path | `/students` |
+| Purpose | Give an authenticated user the names needed to pick a student author or project member. |
+| Authentication | Yes |
+| Roles | `student`, `faculty`, `alumni`, `admin` |
+| Database | `v_user_profiles` where `role = student` and `status = active`. Area filter uses `student_research_areas`. |
+| Requirements | Supports publication authors and project members. This is not a public student directory. |
+
+Query: `q`, `researchAreaId`, `researchAreaMatch`, `departmentId`, `page`, `pageSize`, `sort`, `order`. Same validation as PROF-03. `mentoringAvailability` and `organization` are not filters on this route.
+
+Success `200`: `data` is an array of author candidates (§9.3.1). `meta` is pagination. Email, biography, photo, and batch are omitted.
+
+Inactive students are excluded. A full student profile is still `404` on PROF-07 for anyone who is not that student or an administrator.
+
 #### PROF-07 Get user profile
 
 | | |
@@ -1380,9 +1413,9 @@ Approved content that should disappear from the directory is archived, not delet
 | --- | --- |
 | Method | `POST` |
 | Path | `/research-projects` |
-| Purpose | Faculty, alumni, or an administrator records previous research or thesis work. |
+| Purpose | A student, faculty member, alumnus, or administrator records previous research or thesis work. |
 | Authentication | Yes |
-| Roles | `faculty`, `alumni`, `admin` |
+| Roles | `student`, `faculty`, `alumni`, `admin` |
 | Database | `research_projects`, `project_research_areas`, `project_members` |
 | Requirements | FR-13, FR-14, FR-16 (alumni achievements that are prior work), FR-25 |
 
@@ -1408,11 +1441,11 @@ Each member:
 | `userId` | uuid | Yes | User must have a student, faculty, or alumni profile row. Duplicate user ids rejected. |
 | `memberRole` | enum | Yes | `supervisor`, `co_supervisor`, `author` |
 
-`created_by_user_id` is the caller and must currently be active `faculty`, `alumni`, or `admin`.
+`created_by_user_id` is the caller and must currently be an active `student`, `faculty`, `alumni`, or `admin`.
 
 Success `201`: project object (§9.6).
 
-Errors: `403` students. `422` member has no academic profile, or opportunity id does not exist.
+Errors: `403` when the caller is not one of those roles. `422` member has no academic profile, or opportunity id does not exist.
 
 Transaction: project, areas, and members together.
 
@@ -1519,9 +1552,9 @@ Publication records are metadata. This API does not accept paper files, does not
 | --- | --- |
 | Method | `POST` |
 | Path | `/publications` |
-| Purpose | Faculty or alumni records a publication. Administrators may record one as well. |
+| Purpose | A student, faculty member, alumnus, or administrator records a publication. A conference paper uses this same route. |
 | Authentication | Yes |
-| Roles | `faculty`, `alumni`, `admin` |
+| Roles | `student`, `faculty`, `alumni`, `admin` |
 | Database | `publications`, `publication_authors`, `publication_research_areas` |
 | Requirements | FR-07, FR-16 |
 
@@ -1547,9 +1580,11 @@ Each author:
 | `userId` | uuid | Yes | Academic profile required. Unique in the list. |
 | `authorOrder` | integer | Yes | ≥ 1. Unique in the list. |
 
+A conference paper is not a separate resource and has no `publicationType` column. The web client offers `/publications/new?kind=conference` to students, faculty, alumni, and administrators. That form still posts this body. In the client only, a conference paper requires `title`, at least one `authors` entry, `abstract`, `venue` (labeled conference name), and `publicationYear`. `doi`, `url`, and `publishedOn` stay optional. Research areas stay optional until an administrator approves the record. The API itself still accepts a publication that sends only `title`. Unknown fields, including `publicationType`, are `422`. There is no file upload.
+
 Success `201`: publication object (§9.7).
 
-Errors: `403` students calling create. `409` DOI already used. `422` author without an academic profile, including a pure administrator account.
+Errors: `403` when the caller is not an active student, faculty member, alumnus, or administrator. `409` DOI already used. `422` author without an academic profile, including a pure administrator account, or an unknown field.
 
 Transaction: publication, authors, and areas.
 
@@ -1578,7 +1613,7 @@ Query:
 | `sort` | string | No | `createdAt` (default), `publicationYear`, `title` |
 | `order` | `asc` or `desc` | No | |
 
-Visibility follows §4.2. Students can read approved records. They cannot create them.
+Visibility follows §4.2. Students can read approved records and can create their own.
 
 Success `200`: publication array and `meta`.
 
@@ -2317,7 +2352,7 @@ Requirement text is taken from proposal §6.1.
 | FR-04 | The system shall allow users to securely log in and log out. | `POST /auth/login`, `POST /auth/logout`, `POST /auth/logout-all` | `users`, `refresh_tokens` | All roles | Login no. Logout-all yes. | Covered |
 | FR-05 | The system shall allow faculty members to create and manage research profiles. | `POST /auth/register` with `role=faculty`, `PATCH /me/profile`, `GET /faculty/{userId}` | `users`, `faculty` | Faculty | Yes, after registration | Covered |
 | FR-06 | The system shall allow faculty members to update research interests and areas of expertise. | `PUT /me/research-areas` | `faculty_research_areas`, `research_areas` | Faculty | Yes | Covered |
-| FR-07 | The system shall allow faculty members to upload and manage publication records. | `POST/GET/PATCH /publications`, `POST /publications/{id}/submit`, `DELETE /publications/{id}` | `publications`, `publication_authors`, `publication_research_areas` | Faculty create and edit their own. Students read approved records. | Yes | Covered as records, not file upload (G-11). |
+| FR-07 | The system shall allow faculty members to upload and manage publication records. | `POST/GET/PATCH /publications`, `POST /publications/{id}/submit`, `DELETE /publications/{id}` | `publications`, `publication_authors`, `publication_research_areas` | Students, faculty, and alumni create and edit their own. Administrators may create any. Everyone reads approved records. Conference papers are the same publication fields. | Yes | Covered as records, not file upload (G-11). |
 | FR-08 | The system shall allow faculty members to publish thesis and research opportunities. | `POST /opportunities`, `PATCH /opportunities/{id}`, `POST /opportunities/{id}/submit` | `thesis_opportunities`, `opportunity_research_areas` | Faculty. Admin may create for a faculty owner. | Yes | Covered. Public visibility waits for admin approval (FR-23). |
 | FR-09 | The system shall allow faculty members to update the status of available opportunities. | `PATCH /opportunities/{id}/availability` | `thesis_opportunities.availability_status` | Faculty owner whose current role is still faculty, and admin | Yes | Covered. Values: `open`, `closed`, `filled`. |
 | FR-10 | The system shall allow students to browse faculty profiles. | `GET /faculty`, `GET /faculty/{userId}` | `users`, `faculty`, `departments` | Student, and also the other authenticated roles | Yes | Covered |
@@ -2431,7 +2466,7 @@ Self-service edits by faculty, alumni, and students are not activity logs. FR-28
 | --- | --- | --- | --- |
 | `departments` | `GET /departments`. Referenced by profile and content bodies. | Read. No create or delete in this contract. | Supports FR-01, FR-10, FR-20 |
 | `users` | AUTH-01, AUTH-02, AUTH-06, AUTH-07, PROF-01, ADM-01 through ADM-05 | Create, read, update. No delete. | FR-01, FR-02, FR-04, FR-22, FR-32 |
-| `students` | Register, PROF-01, ADM-05, ADM-06. Not a public directory. | Create, read (self and admin), update | FR-01, FR-24, FR-26 |
+| `students` | Register, PROF-01, PROF-08, ADM-05, ADM-06. PROF-08 is a name list, not a public profile. | Create, read (self, admin, and the candidate list), update | FR-01, FR-24, FR-26 |
 | `faculty` | Register, faculty directory, PROF-01, ADM-05, ADM-06 | Create, read, update | FR-05, FR-10, FR-24 |
 | `alumni` | Register, alumni directory, PROF-01, ADM-05, ADM-06 | Create, read, update | FR-15, FR-18, FR-24 |
 | `alumni_experiences` | ALUM-01 through ALUM-04 | Create, read, update, delete | FR-17 |

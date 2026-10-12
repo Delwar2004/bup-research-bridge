@@ -64,6 +64,7 @@ router.get('/faculty/:userId', authenticate, uuidParam('userId'), handle((req) =
 router.get('/alumni', authenticate, handle((req) => profileService.listAlumni(req.query), 200, 'Alumni retrieved.'));
 router.get('/alumni/:userId/experiences', authenticate, uuidParam('userId'), handle((req) => profileService.listExperiences(req.params.userId), 200, 'Experiences retrieved.'));
 router.get('/alumni/:userId', authenticate, uuidParam('userId'), handle((req) => profileService.getAlumni(req.params.userId), 200, 'Alumni profile retrieved.'));
+router.get('/students', authenticate, handle((req) => profileService.listStudents(req.query), 200, 'Students retrieved.'));
 router.get('/users/:userId', authenticate, uuidParam('userId'), handle((req) => profileService.getUser(req.user, req.params.userId), 200, 'Profile retrieved.'));
 
 router.post('/me/experiences', authenticate, handle((req) => profileService.createExperience(req.user, req.body), 201, 'Experience created.'));

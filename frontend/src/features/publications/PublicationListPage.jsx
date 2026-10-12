@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import { listAlumni, listFaculty } from '../../api/people';
+import { listPeopleDirectory, personLabel, withSelf } from '../../api/people';
 import { listPublications } from '../../api/publications';
 import { listResearchAreas } from '../../api/reference';
 import { useSession } from '../../auth/session';
@@ -79,7 +79,7 @@ function authorNames(authors) {
 export function PublicationListPage() {
   const { user } = useSession();
   const location = useLocation();
-  const canManage = user?.role === 'faculty' || user?.role === 'alumni' || user?.role === 'admin';
+  const canManage = ['student', 'faculty', 'alumni', 'admin'].includes(user?.role);
   const isAdmin = user?.role === 'admin';
   const [searchParams, setSearchParams] = useSearchParams();
   const queryKey = searchParams.toString();
@@ -106,24 +106,15 @@ export function PublicationListPage() {
     let cancelled = false;
     async function loadReference() {
       try {
-        const [areaPayload, facultyPayload, alumniPayload] = await Promise.all([
+        const [areaPayload, peoplePayload] = await Promise.all([
           listResearchAreas(),
-          listFaculty({ pageSize: 100, sort: 'fullName', order: 'asc' }),
-          listAlumni({ pageSize: 100, sort: 'fullName', order: 'asc' }),
+          listPeopleDirectory(),
         ]);
         if (cancelled) return;
         setAreas(areaPayload.data || []);
-        const people = [];
-        const seen = new Set();
-        [...(facultyPayload.data || []), ...(alumniPayload.data || [])].forEach((person) => {
-          if (seen.has(person.id)) return;
-          seen.add(person.id);
-          people.push(person);
-        });
-        people.sort((left, right) => left.fullName.localeCompare(right.fullName));
-        setAuthors(people);
-        if ((facultyPayload.meta?.totalPages || 1) > 1 || (alumniPayload.meta?.totalPages || 1) > 1) {
-          setReferenceNote('The author list shows the first 100 faculty profiles and the first 100 alumni profiles.');
+        setAuthors(withSelf(peoplePayload.people, user));
+        if (peoplePayload.truncated) {
+          setReferenceNote('The author list shows the first 100 faculty, alumni, and student profiles.');
         }
       } catch (err) {
         if (!cancelled) setReferenceError(errorText(err, 'Filters could not be loaded.'));
@@ -133,7 +124,7 @@ export function PublicationListPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     let cancelled = false;
@@ -228,6 +219,7 @@ export function PublicationListPage() {
       {referenceNote ? <p className="field-hint">{referenceNote}</p> : null}
       <div className="button-row">
         {canManage ? <Link className="button" to="/publications/new">New publication</Link> : null}
+        {canManage ? <Link className="button button-secondary" to="/publications/new?kind=conference">New conference paper</Link> : null}
         {canManage ? <Link className="button button-secondary" to="/publications?mine=true">My publications</Link> : null}
         {isAdmin ? <Link className="button button-secondary" to="/publications?moderationStatus=pending">Pending review</Link> : null}
       </div>
@@ -246,7 +238,7 @@ export function PublicationListPage() {
                 <option value={draft.authorUserId}>Selected author</option>
               ) : null}
               {authors.map((person) => (
-                <option key={person.id} value={person.id}>{person.fullName}</option>
+                <option key={person.id} value={person.id}>{personLabel(person)}</option>
               ))}
             </select>
           </FormField>

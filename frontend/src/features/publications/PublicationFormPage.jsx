@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ApiError } from '../../api/client';
-import { listAlumni, listFaculty } from '../../api/people';
+import { listPeopleDirectory, personLabel, withSelf } from '../../api/people';
 import { createPublication, getPublication, updatePublication } from '../../api/publications';
 import { listResearchAreas } from '../../api/reference';
 import { useSession } from '../../auth/session';
@@ -86,9 +86,11 @@ function realDate(value) {
 export function PublicationFormPage({ mode }) {
   const editing = mode === 'edit';
   const { publicationId } = useParams();
+  const [searchParams] = useSearchParams();
   const { user } = useSession();
   const navigate = useNavigate();
   const isAdmin = user?.role === 'admin';
+  const conference = !editing && searchParams.get('kind') === 'conference';
   const [form, setForm] = useState(EMPTY);
   const [original, setOriginal] = useState(null);
   const [areas, setAreas] = useState([]);
@@ -108,31 +110,16 @@ export function PublicationFormPage({ mode }) {
       setLoading(true);
       setLoadError('');
       try {
-        const [areaPayload, facultyPayload, alumniPayload] = await Promise.all([
+        const [areaPayload, peoplePayload] = await Promise.all([
           listResearchAreas(),
-          listFaculty({ pageSize: 100, sort: 'fullName', order: 'asc' }),
-          listAlumni({ pageSize: 100, sort: 'fullName', order: 'asc' }),
+          listPeopleDirectory(),
         ]);
         if (cancelled) return;
         setAreas(areaPayload.data || []);
-        const directory = [];
-        const seen = new Set();
-        [...(facultyPayload.data || []), ...(alumniPayload.data || [])].forEach((person) => {
-          if (seen.has(person.id)) return;
-          seen.add(person.id);
-          directory.push({ id: person.id, fullName: person.fullName });
-        });
-        if ((user?.role === 'faculty' || user?.role === 'alumni') && user.id && !seen.has(user.id)) {
-          directory.push({ id: user.id, fullName: user.fullName });
-        }
-        directory.sort((left, right) => left.fullName.localeCompare(right.fullName));
-        setPeople(directory);
-        const notes = [];
-        if ((facultyPayload.meta?.totalPages || 1) > 1 || (alumniPayload.meta?.totalPages || 1) > 1) {
-          notes.push('The person list shows the first 100 faculty profiles and the first 100 alumni profiles.');
-        }
-        notes.push('Students already listed as authors stay selectable. There is no student directory to add a new student author.');
-        setDirectoryNote(notes.join(' '));
+        setPeople(withSelf(peoplePayload.people, user));
+        setDirectoryNote(peoplePayload.truncated
+          ? 'The person list shows the first 100 faculty, alumni, and student profiles.'
+          : '');
         if (!editing) return;
         const payload = await getPublication(publicationId);
         if (cancelled) return;
@@ -180,9 +167,16 @@ export function PublicationFormPage({ mode }) {
   function clientErrors() {
     const errors = {};
     if (!form.title.trim() || form.title.trim().length > 500) errors.title = 'Title is required and must be at most 500 characters.';
-    if (form.abstract.trim().length > 20000) errors.abstract = 'Abstract must be at most 20000 characters.';
-    if (form.venue.trim().length > 300) errors.venue = 'Venue must be at most 300 characters.';
-    if (yearValue(form.publicationYear) === undefined) errors.publicationYear = 'Year must be empty or a whole number from 1950 through 2100.';
+    if (conference && !form.abstract.trim()) errors.abstract = 'Abstract is required for a conference paper.';
+    else if (form.abstract.trim().length > 20000) errors.abstract = 'Abstract must be at most 20000 characters.';
+    if (conference && !form.venue.trim()) errors.venue = 'Conference name is required.';
+    else if (form.venue.trim().length > 300) errors.venue = 'Venue must be at most 300 characters.';
+    const year = yearValue(form.publicationYear);
+    if (year === undefined || (conference && year == null)) {
+      errors.publicationYear = conference
+        ? 'Publication year is required and must be a whole number from 1950 through 2100.'
+        : 'Year must be empty or a whole number from 1950 through 2100.';
+    }
     if (form.doi.trim().length > 255) errors.doi = 'DOI must be at most 255 characters.';
     if (form.url.length > 2000) errors.url = 'Link must be at most 2000 characters.';
     if (!realDate(form.publishedOn)) errors.publishedOn = 'Use a real date in YYYY-MM-DD form.';
@@ -205,6 +199,9 @@ export function PublicationFormPage({ mode }) {
     }
     if (approved && form.authors.length === 0) {
       errors.authors = 'An approved publication must keep at least one author.';
+    }
+    if (conference && form.authors.length === 0 && !errors.authors) {
+      errors.authors = 'Add at least one author.';
     }
     return errors;
   }
@@ -290,7 +287,7 @@ export function PublicationFormPage({ mode }) {
   if (loadError) {
     return (
       <section className="panel">
-        <h1>{editing ? 'Edit publication' : 'New publication'}</h1>
+        <h1>{editing ? 'Edit publication' : conference ? 'New conference paper' : 'New publication'}</h1>
         <Alert>{loadError}</Alert>
       </section>
     );
@@ -306,11 +303,13 @@ export function PublicationFormPage({ mode }) {
   return (
     <section className="panel">
       <p className="eyebrow">Publications</p>
-      <h1>{editing ? 'Edit publication' : 'New publication'}</h1>
+      <h1>{editing ? 'Edit publication' : conference ? 'New conference paper' : 'New publication'}</h1>
       <p>
         {editing
           ? 'Moderation is changed from the publication page.'
-          : 'A new publication starts as a draft unless you send it for review. Other people see it after an administrator approves it.'}
+          : conference
+            ? 'A conference paper is saved as a publication. The conference name is stored as the venue. It starts as a draft unless you send it for review.'
+            : 'A new publication starts as a draft unless you send it for review. Other people see it after an administrator approves it.'}
       </p>
       <p className="field-hint">The API stores publication metadata and an optional link. It does not accept a paper file. An administrator can approve a record only when it has at least one research area and one author.</p>
       {directoryNote ? <p className="field-hint">{directoryNote}</p> : null}
@@ -319,13 +318,13 @@ export function PublicationFormPage({ mode }) {
         <FormField id="title" label="Title" error={fieldErrors.title}>
           <input id="title" value={form.title} onChange={(event) => update('title', event.target.value)} />
         </FormField>
-        <FormField id="abstract" label="Abstract" error={fieldErrors.abstract}>
+        <FormField id="abstract" label="Abstract" hint={conference ? 'Required for a conference paper.' : undefined} error={fieldErrors.abstract}>
           <textarea id="abstract" rows="6" value={form.abstract} onChange={(event) => update('abstract', event.target.value)} />
         </FormField>
-        <FormField id="venue" label="Venue" error={fieldErrors.venue}>
+        <FormField id="venue" label={conference ? 'Conference name' : 'Venue'} hint={conference ? 'Required. Saved as the publication venue.' : undefined} error={fieldErrors.venue}>
           <input id="venue" value={form.venue} onChange={(event) => update('venue', event.target.value)} />
         </FormField>
-        <FormField id="publicationYear" label="Year" error={fieldErrors.publicationYear}>
+        <FormField id="publicationYear" label={conference ? 'Publication year' : 'Year'} hint={conference ? 'Required.' : undefined} error={fieldErrors.publicationYear}>
           <input id="publicationYear" inputMode="numeric" value={form.publicationYear} onChange={(event) => update('publicationYear', event.target.value)} />
         </FormField>
         <FormField id="publishedOn" label="Published on" error={fieldErrors.publishedOn}>
@@ -363,7 +362,11 @@ export function PublicationFormPage({ mode }) {
         </fieldset>
         <fieldset className="field">
           <legend>Authors</legend>
-          <p className="field-hint">Faculty and alumni profiles can be added. A person and an author order can each appear once.</p>
+          <p className="field-hint">
+            {conference
+              ? 'At least one author is required. Choose a student, faculty member, or alumnus who already has an account. A person and an author order can each appear once.'
+              : 'Students, faculty, and alumni can be added. A person and an author order can each appear once.'}
+          </p>
           {form.authors.map((author) => (
             <div className="member-row" key={author.key}>
               <div className="field">
@@ -371,7 +374,7 @@ export function PublicationFormPage({ mode }) {
                 <select id={`${author.key}-user`} value={author.userId} onChange={(event) => updateAuthor(author.key, 'userId', event.target.value)}>
                   <option value="">Choose a person</option>
                   {peopleOptions.map((person) => (
-                    <option key={person.id} value={person.id}>{person.fullName}</option>
+                    <option key={person.id} value={person.id}>{personLabel(person)}</option>
                   ))}
                 </select>
               </div>
@@ -406,7 +409,7 @@ export function PublicationFormPage({ mode }) {
           {fieldErrors.authors ? <p className="field-error">{fieldErrors.authors}</p> : null}
         </fieldset>
         <div className="button-row">
-          <button className="button" type="submit" disabled={submitting}>{submitting ? 'Saving…' : 'Save publication'}</button>
+          <button className="button" type="submit" disabled={submitting}>{submitting ? 'Saving…' : conference ? 'Save conference paper' : 'Save publication'}</button>
           <Link className="button button-secondary" to={editing ? `/publications/${publicationId}` : '/publications'}>Cancel</Link>
         </div>
       </form>

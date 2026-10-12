@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import { listAlumni, listFaculty } from '../../api/people';
+import { listPeopleDirectory, personLabel, withSelf } from '../../api/people';
 import { listProjects } from '../../api/projects';
 import { listDepartments, listResearchAreas } from '../../api/reference';
 import { useSession } from '../../auth/session';
@@ -90,7 +90,7 @@ function yearOrBlank(value) {
 export function ProjectListPage() {
   const { user } = useSession();
   const location = useLocation();
-  const canManage = user?.role === 'faculty' || user?.role === 'alumni' || user?.role === 'admin';
+  const canManage = ['student', 'faculty', 'alumni', 'admin'].includes(user?.role);
   const isAdmin = user?.role === 'admin';
   const [searchParams, setSearchParams] = useSearchParams();
   const queryKey = searchParams.toString();
@@ -118,27 +118,17 @@ export function ProjectListPage() {
     let cancelled = false;
     async function loadReference() {
       try {
-        const [departmentPayload, areaPayload, facultyPayload, alumniPayload] = await Promise.all([
+        const [departmentPayload, areaPayload, peoplePayload] = await Promise.all([
           listDepartments(),
           listResearchAreas(),
-          listFaculty({ pageSize: 100, sort: 'fullName', order: 'asc' }),
-          listAlumni({ pageSize: 100, sort: 'fullName', order: 'asc' }),
+          listPeopleDirectory(),
         ]);
         if (cancelled) return;
         setDepartments(departmentPayload.data || []);
         setAreas(areaPayload.data || []);
-        const people = [];
-        const seen = new Set();
-        [...(facultyPayload.data || []), ...(alumniPayload.data || [])].forEach((person) => {
-          if (seen.has(person.id)) return;
-          seen.add(person.id);
-          people.push(person);
-        });
-        people.sort((left, right) => left.fullName.localeCompare(right.fullName));
-        setMembers(people);
-        const truncated = (facultyPayload.meta?.totalPages || 1) > 1 || (alumniPayload.meta?.totalPages || 1) > 1;
-        if (truncated) {
-          setReferenceNote('The member list shows the first 100 faculty profiles and the first 100 alumni profiles.');
+        setMembers(withSelf(peoplePayload.people, user));
+        if (peoplePayload.truncated) {
+          setReferenceNote('The member list shows the first 100 faculty, alumni, and student profiles.');
         }
       } catch (err) {
         if (!cancelled) setReferenceError(errorText(err, 'Filters could not be loaded.'));
@@ -148,7 +138,7 @@ export function ProjectListPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     let cancelled = false;
@@ -275,7 +265,7 @@ export function ProjectListPage() {
                 <option value={draft.memberUserId}>Selected member</option>
               ) : null}
               {members.map((person) => (
-                <option key={person.id} value={person.id}>{person.fullName}</option>
+                <option key={person.id} value={person.id}>{personLabel(person)}</option>
               ))}
             </select>
           </FormField>

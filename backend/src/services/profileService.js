@@ -82,6 +82,22 @@ async function listAlumni(queryParams) {
   }, { fullName: 'asc', updatedAt: 'desc' });
 }
 
+async function listStudents(queryParams) {
+  const listed = await listDirectory('student', queryParams, {
+    fullName: 'p.full_name',
+    updatedAt: 'p.updated_at',
+  }, { fullName: 'asc', updatedAt: 'desc' });
+  return {
+    data: listed.data.map((person) => ({
+      id: person.id,
+      fullName: person.fullName,
+      role: person.role,
+      department: person.department,
+    })),
+    meta: listed.meta,
+  };
+}
+
 async function listDirectory(role, queryParams, allow, defaults) {
   const areaIds = parseQueryUuidList(queryParams.researchAreaId, 'researchAreaId');
   const areaMatch = queryParams.researchAreaMatch || 'any';
@@ -93,7 +109,9 @@ async function listDirectory(role, queryParams, allow, defaults) {
     role,
     q: parseOptionalText(queryParams.q, 'q', 200),
     departmentId: parseQueryUuid(queryParams.departmentId, 'departmentId'),
-    mentoringAvailability: parseQueryBool(queryParams.mentoringAvailability, 'mentoringAvailability'),
+    mentoringAvailability: role === 'student'
+      ? undefined
+      : parseQueryBool(queryParams.mentoringAvailability, 'mentoringAvailability'),
     organization: role === 'alumni' ? parseOptionalText(queryParams.organization, 'organization', 200) : undefined,
     areaIds,
     areaMatch,
@@ -220,6 +238,7 @@ module.exports = {
   replaceAreas,
   listFaculty,
   listAlumni,
+  listStudents,
   getFaculty,
   getAlumni,
   getUser,

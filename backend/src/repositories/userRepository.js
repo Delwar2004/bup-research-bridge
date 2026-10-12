@@ -227,6 +227,12 @@ async function revokeAllRefreshTokens(db, userId) {
   return rowCount;
 }
 
+const RESEARCH_AREA_LINKS = {
+  faculty: { table: 'faculty_research_areas', column: 'faculty_user_id' },
+  alumni: { table: 'alumni_research_areas', column: 'alumni_user_id' },
+  student: { table: 'student_research_areas', column: 'student_user_id' },
+};
+
 function personFilters(filters) {
   const clauses = ['p.role = $1', 'p.status = \'active\''];
   const params = [filters.role];
@@ -249,8 +255,11 @@ function personFilters(filters) {
   if (filters.areaIds && filters.areaIds.length) {
     params.push(filters.areaIds);
     const areaParam = `$${params.length}`;
-    const table = filters.role === 'faculty' ? 'faculty_research_areas' : 'alumni_research_areas';
-    const column = filters.role === 'faculty' ? 'faculty_user_id' : 'alumni_user_id';
+    const link = RESEARCH_AREA_LINKS[filters.role];
+    if (!link) {
+      throw new Error(`Research-area filter is not defined for role ${filters.role}.`);
+    }
+    const { table, column } = link;
     if (filters.areaMatch === 'all') {
       clauses.push(`(
         SELECT count(DISTINCT research_area_id) FROM ${table}
