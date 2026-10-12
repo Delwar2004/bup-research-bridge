@@ -157,7 +157,7 @@ Historical profile rows may remain after a role change. Directory reads use the 
 | Post a message on a request | If they are the student | If they are the mentor | If they are the mentor | No |
 | Read message bodies | Party to that request | Party to that request | Party to that request | No |
 | Read own notifications | Yes | Yes | Yes | Yes |
-| Manage accounts, logs, reports | No | No | No | Yes |
+| Manage accounts, logs, reports | No | No | No | Yes. Account delete cannot remove the signed-in admin or the last administrator |
 
 Department authority is a proposal stakeholder with no `user_role` value and no table. This API has no department-authority endpoints. See gap G-05.
 
@@ -493,9 +493,10 @@ Not included: `email`, `bio`, `profilePhotoUrl`, `batch`, `researchAreas`, `stat
 | --- | --- | --- |
 | `id` | uuid | |
 | `createdByUserId` | uuid | |
+| `createdByName` | string | `users.full_name` of the recorder |
 | `title` | string | 1–500 trimmed |
 | `abstract` | string or null | 1–20000 if present |
-| `venue` | string or null | 1–300 trimmed |
+| `venue` | string or null | 1–300 trimmed. A conference name is stored here. |
 | `publicationYear` | integer or null | 1950–2100 |
 | `doi` | string or null | 1–255 trimmed. Unique on `lower(doi)`. |
 | `url` | string or null | 1–2000 |
@@ -688,6 +689,7 @@ Enum values sent by clients must match the PostgreSQL labels exactly. No aliases
 | ADM-11 | GET | `/admin/reports/summary` | Yes | FR-31 |
 | ADM-12 | POST | `/admin/research-areas` | Yes | Add a vocabulary term |
 | ADM-13 | PATCH | `/admin/research-areas/{researchAreaId}` | Yes | Rename or deactivate a term |
+| ADM-14 | DELETE | `/admin/users/{userId}` | Yes | Delete an account |
 
 There is no public `POST /notifications`. Notifications are written by the operations in §16.
 
@@ -2090,6 +2092,39 @@ Side effects in one transaction when `status` changes:
 
 Errors: `409` email conflict. An administrator may suspend their own account; the contract allows it and they will lose refresh tokens. See gap G-10.
 
+#### ADM-14 Delete account
+
+| | |
+| --- | --- |
+| Method | `DELETE` |
+| Path | `/admin/users/{userId}` |
+| Purpose | Permanently remove an account when an administrator asks for it. |
+| Authentication | Yes |
+| Roles | `admin` |
+| Requirements | FR-22, FR-24 |
+
+No body.
+
+The caller cannot delete the account they are signed in with (`409`). The last remaining administrator cannot be deleted (`409`).
+
+Dependent rows that use `ON DELETE RESTRICT` are cleared in the same transaction:
+
+| Record | What happens |
+| --- | --- |
+| Mentorship request where this person is the student or the mentor | Deleted. Messages on that request go with it. |
+| Opportunity owned by this faculty member, or still recorded by this account after reassignment | Deleted. A request that points at that opportunity is deleted first. |
+| Opportunity this account recorded for a faculty member who remains | `created_by_user_id` moves to that faculty member. |
+| Publication this account recorded, with another active author | The record moves to the first remaining author, then this person is removed from the author list. |
+| Publication with no remaining author | Deleted. |
+| Approved publication that would be left with no author | Archived, then this person is removed from the author list. |
+| Research project | Same rules as a publication, using project members. |
+| Profile, refresh tokens, and this person's notifications | Removed with the user row. |
+| Activity log rows this person wrote | Kept. `actor_user_id` becomes null. |
+
+Success `200`: `data` is `{ "id": "uuid" }`. `activity_logs` action `user.deleted`.
+
+Errors: `404` unknown id. `409` own account or last administrator. `403` when the caller is not an administrator.
+
 #### ADM-05 Change role
 
 | | |
@@ -2367,7 +2402,7 @@ Requirement text is taken from proposal §6.1.
 | FR-19 | The system shall allow users to search research content using keywords. | `GET /search`, plus `q` on opportunity, project, and publication lists | `search_vector` columns | All authenticated roles | Yes | Covered. PostgreSQL only. |
 | FR-20 | The system shall provide advanced filtering based on research domains, expertise, publications, and opportunities. | Query parameters on `GET /faculty`, `GET /alumni`, `GET /opportunities`, `GET /publications`, `GET /research-projects`, `GET /search` | Research-area junctions and content tables | All authenticated roles | Yes | Covered |
 | FR-21 | The system shall provide profile viewing functionality for all authorized users. | `GET /users/{userId}`, `GET /auth/me`, `GET /faculty/{userId}`, `GET /alumni/{userId}` | `v_user_profiles` | Authorized as in PROF-07 | Yes | Covered. Email is limited to self and admin. |
-| FR-22 | The system shall allow administrators to manage user accounts. | `GET/POST /admin/users`, `GET/PATCH /admin/users/{userId}` | `users` | Admin | Yes | Covered. No hard delete (G-12). |
+| FR-22 | The system shall allow administrators to manage user accounts. | `GET/POST /admin/users`, `GET/PATCH/DELETE /admin/users/{userId}` | `users` | Admin | Yes | Covered. ADM-14 deletes an account. The signed-in admin and the last administrator are protected. |
 | FR-23 | The system shall allow administrators to approve, update, or remove platform content. | ADM-07, ADM-08, ADM-09, admin use of OPP-04, PRJ-04, PUB-04, and the DELETE endpoints. Archive is the removal that keeps history. | `thesis_opportunities`, `research_projects`, `publications`, `activity_logs` | Admin | Yes | Covered |
 | FR-24 | The system shall allow administrators to manage faculty, student, and alumni records. | `PATCH /admin/users/{userId}/profile`, `POST /admin/users/{userId}/role`, `POST /admin/users` | `students`, `faculty`, `alumni`, `users` | Admin | Yes | Covered. Role change is schema-driven (G-03). |
 | FR-25 | The system shall maintain a centralized repository of research-related information. | API not a separate product feature. The repository is the database, read and written by profile, opportunity, project, and publication endpoints. | All content tables | Writers as in §4.1. Readers authenticated. | Yes | Covered by the schema plus those endpoints |
@@ -2465,7 +2500,7 @@ Self-service edits by faculty, alumni, and students are not activity logs. FR-28
 | Database table | API endpoint(s) | CRUD | Relevant FR |
 | --- | --- | --- | --- |
 | `departments` | `GET /departments`. Referenced by profile and content bodies. | Read. No create or delete in this contract. | Supports FR-01, FR-10, FR-20 |
-| `users` | AUTH-01, AUTH-02, AUTH-06, AUTH-07, PROF-01, ADM-01 through ADM-05 | Create, read, update. No delete. | FR-01, FR-02, FR-04, FR-22, FR-32 |
+| `users` | AUTH-01, AUTH-02, AUTH-06, AUTH-07, PROF-01, ADM-01 through ADM-06, ADM-14 | Create, read, update, delete | FR-01, FR-02, FR-04, FR-22, FR-32 |
 | `students` | Register, PROF-01, PROF-08, ADM-05, ADM-06. PROF-08 is a name list, not a public profile. | Create, read (self, admin, and the candidate list), update | FR-01, FR-24, FR-26 |
 | `faculty` | Register, faculty directory, PROF-01, ADM-05, ADM-06 | Create, read, update | FR-05, FR-10, FR-24 |
 | `alumni` | Register, alumni directory, PROF-01, ADM-05, ADM-06 | Create, read, update | FR-15, FR-18, FR-24 |
@@ -2511,7 +2546,7 @@ These are reported. They are not fixed in the database and they are not papered 
 | G-09 | Slots versus accepted requests | `slots` is an integer. Nothing counts accepted mentorships. | Faculty set `filled` manually. The API does not invent a counter. |
 | G-10 | Last administrator | An admin can suspend themselves. No guard column exists. | Allowed. Operations must keep another active admin. |
 | G-11 | "Upload" publications | FR-07 says upload. The table has metadata and a URL, not a file bytea or object-storage key. | JSON metadata and an optional URL. No multipart file endpoint. |
-| G-12 | Deleting users | Many foreign keys are `ON DELETE RESTRICT` (`created_by`, mentorship, authors). | No user-delete endpoint. `suspended` and `rejected` are the account actions. |
+| G-12 | Deleting users | Many foreign keys are `ON DELETE RESTRICT` (`created_by`, mentorship, authors). | ADM-14 deletes the account and clears those references in one transaction. `suspended` and `rejected` remain available when the row should stay. |
 | G-13 | External academic systems | NFR-14. Proposal §4.4 excludes journal and conference integration. | No integration endpoints in v1. |
 | G-14 | Registration approval | Schema default status is `pending`. The proposal does not say an admin must approve signups. | The API follows the schema. Pending users cannot log in until ADM-04 sets `active`. |
 | G-15 | Opportunity applications | No application table. | Not built. Mentorship plus optional `opportunityId` is the only student action on an opening. |

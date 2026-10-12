@@ -262,6 +262,33 @@ function parseModeration(body) {
   return { moderationStatus, note };
 }
 
+function hasRows(value) {
+  return Array.isArray(value) && value.length > 0;
+}
+
+async function deleteUser(actor, userId) {
+  if (actor.id === userId) throw conflict('You cannot delete your own account.');
+  const existing = await userRepository.findProfileById({ query }, userId);
+  if (!existing) throw notFound();
+  if (existing.role === 'admin' && await userRepository.countAdmins({ query }) <= 1) {
+    throw conflict('The last administrator account cannot be deleted.');
+  }
+  await withTransaction(async (db) => {
+    await userRepository.releaseAccountReferences(db, userId);
+    await insertActivity(db, {
+      actorUserId: actor.id,
+      action: 'user.deleted',
+      entityType: 'users',
+      entityId: userId,
+      summary: `Deleted the ${existing.role} account ${existing.full_name}.`,
+      metadata: { role: existing.role, email: existing.email },
+    });
+    const removed = await userRepository.deleteUser(db, userId);
+    if (!removed) throw notFound();
+  });
+  return { id: userId };
+}
+
 async function moderate(actor, kind, id, body) {
   const { moderationStatus, note } = parseModeration(body);
   const loaders = {
@@ -274,6 +301,25 @@ async function moderate(actor, kind, id, body) {
   if (!existing) throw notFound();
   if (existing.moderation_status === moderationStatus) {
     throw conflict('The record already has that moderation status.');
+  }
+  if (moderationStatus === 'approved' && kind === 'publication') {
+    if (!hasRows(existing.authors)) {
+      throw invalid('authors', 'required', 'An approved publication must include at least one author.');
+    }
+    if (!hasRows(existing.research_areas)) {
+      throw invalid('researchAreaIds', 'required', 'An approved publication must include at least one research area.');
+    }
+  }
+  if (moderationStatus === 'approved' && kind === 'project') {
+    if (!hasRows(existing.members)) {
+      throw invalid('members', 'required', 'An approved research project must include at least one member.');
+    }
+    if (!hasRows(existing.research_areas)) {
+      throw invalid('researchAreaIds', 'required', 'An approved research project must include at least one research area.');
+    }
+  }
+  if (moderationStatus === 'approved' && kind === 'opportunity' && !hasRows(existing.research_areas)) {
+    throw invalid('researchAreaIds', 'required', 'An approved opportunity must include at least one research area.');
   }
   const ownerId = kind === 'opportunity' ? existing.faculty_user_id : existing.created_by_user_id;
   const entityType = kind === 'opportunity' ? 'thesis_opportunities' : kind === 'project' ? 'research_projects' : 'publications';
@@ -393,6 +439,7 @@ module.exports = {
   createUser,
   getUser,
   updateUser,
+  deleteUser,
   changeRole,
   updateProfile,
   moderate,

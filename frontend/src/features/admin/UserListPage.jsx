@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { listUsers } from '../../api/admin';
 import { listDepartments } from '../../api/reference';
 import { Alert } from '../../components/Alert';
@@ -40,6 +40,7 @@ function writeFilters(filters, page = '1') {
 }
 
 export function UserListPage() {
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryKey = searchParams.toString();
   const filters = useMemo(() => readFilters(new URLSearchParams(queryKey)), [queryKey]);
@@ -49,6 +50,7 @@ export function UserListPage() {
   const [meta, setMeta] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [notice] = useState(location.state?.notice || '');
 
   useEffect(() => {
     setDraft(filters);
@@ -108,7 +110,8 @@ export function UserListPage() {
       <p className="eyebrow">Administrator</p>
       <h1>Accounts</h1>
       <AdminNav />
-      <p>Search accounts by name or email. There is no account deletion.</p>
+      <p>Search accounts by name or email. Open an account to delete it. You cannot delete the account you are signed in with, or the last administrator.</p>
+      {notice ? <Alert tone="success">{notice}</Alert> : null}
       <p><Link className="button" to="/admin/users/new">Create account</Link></p>
       <form className="filter-form" onSubmit={(event) => { event.preventDefault(); setSearchParams(writeFilters(draft)); }}>
         <div className="filter-grid">

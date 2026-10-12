@@ -17,6 +17,10 @@ export function updateUser(userId, body) {
   return apiRequest(`/admin/users/${userId}`, { method: 'PATCH', body });
 }
 
+export function deleteUser(userId) {
+  return apiRequest(`/admin/users/${userId}`, { method: 'DELETE' });
+}
+
 export function changeUserRole(userId, body) {
   return apiRequest(`/admin/users/${userId}/role`, { method: 'POST', body });
 }

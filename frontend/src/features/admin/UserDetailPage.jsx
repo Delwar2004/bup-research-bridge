@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ApiError } from '../../api/client';
-import { changeUserRole, getUser, updateUser, updateUserProfile } from '../../api/admin';
+import { changeUserRole, deleteUser, getUser, updateUser, updateUserProfile } from '../../api/admin';
 import { listDepartments } from '../../api/reference';
 import { useSession } from '../../auth/session';
 import { Alert } from '../../components/Alert';
@@ -56,6 +56,7 @@ function roleProfile(role, form) {
 
 export function UserDetailPage() {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const { user } = useSession();
   const [account, setAccount] = useState(null);
   const [departments, setDepartments] = useState([]);
@@ -366,6 +367,41 @@ export function UserDetailPage() {
         ) : null}
         <button className="button" type="submit" disabled={pending === 'role'}>{pending === 'role' ? 'Saving…' : 'Save role'}</button>
       </form>
+
+      {user?.id === account.id ? (
+        <div className="related-section">
+          <h2>Delete account</h2>
+          <p>You cannot delete the account you are signed in with.</p>
+        </div>
+      ) : (
+        <div className="related-section">
+          <h2>Delete account</h2>
+          <p>
+            This removes the account and its sign-in. Publications or projects that only this person recorded are deleted.
+            Shared records stay, without this person&apos;s name. An opportunity owned by this faculty member is deleted.
+          </p>
+          <button
+            className="button button-secondary"
+            type="button"
+            disabled={pending === 'delete'}
+            onClick={async () => {
+              if (!window.confirm(`Delete ${account.fullName}'s account? This cannot be undone.`)) return;
+              setPending('delete');
+              setError('');
+              setNotice('');
+              try {
+                const payload = await deleteUser(account.id);
+                navigate('/admin/users', { state: { notice: payload.message || 'Account deleted.' } });
+              } catch (err) {
+                setError(errorText(err, 'The account could not be deleted.'));
+                setPending('');
+              }
+            }}
+          >
+            {pending === 'delete' ? 'Deleting…' : 'Delete account'}
+          </button>
+        </div>
+      )}
     </section>
   );
 }
