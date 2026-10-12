@@ -115,6 +115,7 @@ admin.get('/users/:userId', uuidParam('userId'), handle((req) => adminService.ge
 admin.patch('/users/:userId/profile', uuidParam('userId'), handle((req) => adminService.updateProfile(req.user, req.params.userId, req.body), 200, 'Profile updated.'));
 admin.post('/users/:userId/role', uuidParam('userId'), handle((req) => adminService.changeRole(req.user, req.params.userId, req.body), 200, 'Role updated.'));
 admin.patch('/users/:userId', uuidParam('userId'), handle((req) => adminService.updateUser(req.user, req.params.userId, req.body), 200, 'User updated.'));
+admin.delete('/users/:userId', uuidParam('userId'), handle((req) => adminService.deleteUser(req.user, req.params.userId), 200, 'Account deleted.'));
 admin.patch('/opportunities/:opportunityId/moderation', uuidParam('opportunityId'), handle((req) => adminService.moderate(req.user, 'opportunity', req.params.opportunityId, req.body), 200, 'Opportunity moderated.'));
 admin.patch('/research-projects/:projectId/moderation', uuidParam('projectId'), handle((req) => adminService.moderate(req.user, 'project', req.params.projectId, req.body), 200, 'Research project moderated.'));
 admin.patch('/publications/:publicationId/moderation', uuidParam('publicationId'), handle((req) => adminService.moderate(req.user, 'publication', req.params.publicationId, req.body), 200, 'Publication moderated.'));

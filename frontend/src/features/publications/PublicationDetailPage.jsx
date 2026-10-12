@@ -118,7 +118,7 @@ export function PublicationDetailPage() {
           <dd>{item.publicationYear ?? 'Not listed'}</dd>
         </div>
         <div>
-          <dt>Venue</dt>
+          <dt>Venue or conference</dt>
           <dd>{item.venue || 'Not listed'}</dd>
         </div>
         <div>
@@ -133,18 +133,10 @@ export function PublicationDetailPage() {
           <dt>Moderation</dt>
           <dd>{item.moderationStatus}</dd>
         </div>
-        {isCreator ? (
-          <div>
-            <dt>Recorded by</dt>
-            <dd>You recorded this publication.</dd>
-          </div>
-        ) : null}
-        {isAdmin && !isCreator ? (
-          <div>
-            <dt>Recorded by</dt>
-            <dd>{item.createdByUserId}</dd>
-          </div>
-        ) : null}
+        <div>
+          <dt>Recorded by</dt>
+          <dd>{isCreator ? 'You recorded this publication.' : (item.createdByName || 'Unknown')}</dd>
+        </div>
         {item.publishedAt ? (
           <div>
             <dt>Approved</dt>

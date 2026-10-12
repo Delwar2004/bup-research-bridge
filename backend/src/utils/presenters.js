@@ -126,6 +126,7 @@ function toPublication(row) {
   return {
     id: row.id,
     createdByUserId: row.created_by_user_id,
+    createdByName: row.created_by_name ?? null,
     title: row.title,
     abstract: row.abstract ?? null,
     venue: row.venue ?? null,

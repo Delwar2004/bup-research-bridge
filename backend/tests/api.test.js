@@ -408,6 +408,122 @@ test('a student can record a conference-shaped publication and a project', async
   assert.equal(project.body.data.members[0].userId, studentId);
 });
 
+test('an administrator can delete another account without breaking shared publications', async () => {
+  const token = await adminToken();
+  const me = await request(app).get('/api/v1/auth/me').set('Authorization', `Bearer ${token}`);
+  assert.equal(me.status, 200);
+  const adminId = me.body.data.id;
+
+  await register('student', { batch: 'BICE-2024' });
+  await register('alumni', { batch: '2018', currentOrganization: 'BUP Lab' });
+  await register('faculty', { designation: 'Lecturer' });
+  const studentId = await activate(token, 'student@bup.test');
+  const alumniId = await activate(token, 'alumni@bup.test');
+  const facultyId = await activate(token, 'faculty@bup.test');
+  const studentToken = (await login('student@bup.test')).body.data.accessToken;
+  const alumniToken = (await login('alumni@bup.test')).body.data.accessToken;
+  const facultyToken = (await login('faculty@bup.test')).body.data.accessToken;
+
+  const shared = await request(app)
+    .post('/api/v1/publications')
+    .set('Authorization', `Bearer ${alumniToken}`)
+    .send({
+      title: 'Shared conference paper',
+      abstract: 'Written together.',
+      venue: 'BUP Computing Conference',
+      publicationYear: 2026,
+      authors: [
+        { userId: alumniId, authorOrder: 1 },
+        { userId: studentId, authorOrder: 2 },
+      ],
+      researchAreaIds: [ML],
+    });
+  assert.equal(shared.status, 201);
+  assert.equal(shared.body.data.createdByName, 'alumni Person');
+
+  const reassigned = await request(app)
+    .post('/api/v1/publications')
+    .set('Authorization', `Bearer ${studentToken}`)
+    .send({
+      title: 'Student paper with an alumni coauthor',
+      authors: [
+        { userId: studentId, authorOrder: 1 },
+        { userId: alumniId, authorOrder: 2 },
+      ],
+    });
+  assert.equal(reassigned.status, 201);
+
+  const solo = await request(app)
+    .post('/api/v1/publications')
+    .set('Authorization', `Bearer ${studentToken}`)
+    .send({
+      title: 'Student only paper',
+      authors: [{ userId: studentId, authorOrder: 1 }],
+    });
+  assert.equal(solo.status, 201);
+
+  const opening = await request(app)
+    .post('/api/v1/opportunities')
+    .set('Authorization', `Bearer ${facultyToken}`)
+    .send({
+      opportunityType: 'research',
+      title: 'Faculty opening',
+      description: 'Work that should leave with the faculty account.',
+      researchAreaIds: [ML],
+    });
+  assert.equal(opening.status, 201);
+
+  const forbidden = await request(app)
+    .delete(`/api/v1/admin/users/${studentId}`)
+    .set('Authorization', `Bearer ${studentToken}`);
+  assert.equal(forbidden.status, 403);
+
+  const selfDelete = await request(app)
+    .delete(`/api/v1/admin/users/${adminId}`)
+    .set('Authorization', `Bearer ${token}`);
+  assert.equal(selfDelete.status, 409);
+
+  const removedStudent = await request(app)
+    .delete(`/api/v1/admin/users/${studentId}`)
+    .set('Authorization', `Bearer ${token}`);
+  assert.equal(removedStudent.status, 200);
+  assert.equal(removedStudent.body.data.id, studentId);
+
+  const studentGone = await request(app)
+    .get(`/api/v1/admin/users/${studentId}`)
+    .set('Authorization', `Bearer ${token}`);
+  assert.equal(studentGone.status, 404);
+  assert.equal((await login('student@bup.test')).status, 401);
+
+  const sharedAfter = await request(app)
+    .get(`/api/v1/publications/${shared.body.data.id}`)
+    .set('Authorization', `Bearer ${alumniToken}`);
+  assert.equal(sharedAfter.status, 200);
+  assert.equal(sharedAfter.body.data.createdByUserId, alumniId);
+  assert.deepEqual(sharedAfter.body.data.authors.map((author) => author.userId), [alumniId]);
+
+  const moved = await request(app)
+    .get(`/api/v1/publications/${reassigned.body.data.id}`)
+    .set('Authorization', `Bearer ${alumniToken}`);
+  assert.equal(moved.status, 200);
+  assert.equal(moved.body.data.createdByUserId, alumniId);
+  assert.deepEqual(moved.body.data.authors.map((author) => author.userId), [alumniId]);
+
+  const soloAfter = await request(app)
+    .get(`/api/v1/publications/${solo.body.data.id}`)
+    .set('Authorization', `Bearer ${token}`);
+  assert.equal(soloAfter.status, 404);
+
+  const removedFaculty = await request(app)
+    .delete(`/api/v1/admin/users/${facultyId}`)
+    .set('Authorization', `Bearer ${token}`);
+  assert.equal(removedFaculty.status, 200);
+  const openingAfter = await request(app)
+    .get(`/api/v1/opportunities/${opening.body.data.id}`)
+    .set('Authorization', `Bearer ${token}`);
+  assert.equal(openingAfter.status, 404);
+});
+
 test('remaining contract paths for profiles, content, and administration', async () => {
   const token = await adminToken();
   await register('faculty', { designation: 'Lecturer' });

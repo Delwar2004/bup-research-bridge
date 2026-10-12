@@ -348,6 +348,119 @@ async function facultyDepartmentId(db, userId) {
   return rows[0] ? rows[0].department_id : null;
 }
 
+async function countAdmins(db) {
+  const { rows } = await db.query(`SELECT count(*)::int AS total FROM users WHERE role = 'admin'`);
+  return rows[0].total;
+}
+
+async function releaseAccountReferences(db, userId) {
+  await db.query(`DELETE FROM mentorship_messages WHERE sender_user_id = $1`, [userId]);
+
+  await db.query(
+    `UPDATE thesis_opportunities AS opening
+     SET created_by_user_id = opening.faculty_user_id
+     WHERE opening.created_by_user_id = $1
+       AND opening.faculty_user_id <> $1
+       AND EXISTS (
+         SELECT 1 FROM users owner
+         WHERE owner.id = opening.faculty_user_id
+           AND owner.status = 'active'
+           AND owner.role IN ('faculty', 'admin')
+       )`,
+    [userId],
+  );
+
+  await db.query(
+    `DELETE FROM mentorship_requests
+     WHERE student_user_id = $1
+        OR mentor_user_id = $1
+        OR opportunity_id IN (
+          SELECT id FROM thesis_opportunities
+          WHERE faculty_user_id = $1 OR created_by_user_id = $1
+        )`,
+    [userId],
+  );
+
+  await db.query(
+    `DELETE FROM thesis_opportunities
+     WHERE faculty_user_id = $1 OR created_by_user_id = $1`,
+    [userId],
+  );
+
+  await db.query(
+    `UPDATE publications AS publication
+     SET created_by_user_id = next_author.user_id
+     FROM (
+       SELECT DISTINCT ON (author.publication_id) author.publication_id, author.user_id
+       FROM publication_authors author
+       JOIN users person ON person.id = author.user_id
+       JOIN publications owned ON owned.id = author.publication_id
+       WHERE owned.created_by_user_id = $1
+         AND author.user_id <> $1
+         AND person.status = 'active'
+         AND person.role IN ('student', 'faculty', 'alumni', 'admin')
+       ORDER BY author.publication_id, author.author_order
+     ) AS next_author
+     WHERE publication.id = next_author.publication_id`,
+    [userId],
+  );
+  await db.query(`DELETE FROM publications WHERE created_by_user_id = $1`, [userId]);
+  await db.query(
+    `UPDATE publications AS publication
+     SET moderation_status = 'archived'
+     WHERE publication.moderation_status = 'approved'
+       AND EXISTS (
+         SELECT 1 FROM publication_authors author
+         WHERE author.publication_id = publication.id AND author.user_id = $1
+       )
+       AND NOT EXISTS (
+         SELECT 1 FROM publication_authors author
+         WHERE author.publication_id = publication.id AND author.user_id <> $1
+       )`,
+    [userId],
+  );
+  await db.query(`DELETE FROM publication_authors WHERE user_id = $1`, [userId]);
+
+  await db.query(
+    `UPDATE research_projects AS project
+     SET created_by_user_id = next_member.user_id
+     FROM (
+       SELECT DISTINCT ON (member.project_id) member.project_id, member.user_id
+       FROM project_members member
+       JOIN users person ON person.id = member.user_id
+       JOIN research_projects owned ON owned.id = member.project_id
+       WHERE owned.created_by_user_id = $1
+         AND member.user_id <> $1
+         AND person.status = 'active'
+         AND person.role IN ('student', 'faculty', 'alumni', 'admin')
+       ORDER BY member.project_id, member.user_id
+     ) AS next_member
+     WHERE project.id = next_member.project_id`,
+    [userId],
+  );
+  await db.query(`DELETE FROM research_projects WHERE created_by_user_id = $1`, [userId]);
+  await db.query(
+    `UPDATE research_projects AS project
+     SET moderation_status = 'archived'
+     WHERE project.moderation_status = 'approved'
+       AND EXISTS (
+         SELECT 1 FROM project_members member
+         WHERE member.project_id = project.id AND member.user_id = $1
+       )
+       AND NOT EXISTS (
+         SELECT 1 FROM project_members member
+         WHERE member.project_id = project.id AND member.user_id <> $1
+       )`,
+    [userId],
+  );
+  await db.query(`DELETE FROM project_members WHERE user_id = $1`, [userId]);
+}
+
+async function deleteUser(db, userId) {
+  const { rowCount } = await db.query(`DELETE FROM users WHERE id = $1`, [userId]);
+  return rowCount;
+}
+
 module.exports = {
   PROFILE_SELECT,
   findCredentialsByEmail,
@@ -371,4 +484,7 @@ module.exports = {
   listUsersAdmin,
   academicProfileIds,
   facultyDepartmentId,
+  countAdmins,
+  releaseAccountReferences,
+  deleteUser,
 };

@@ -228,7 +228,7 @@ export function PublicationListPage() {
           <FormField id="publication-q" label="Search" hint="Title, abstract, or venue.">
             <input id="publication-q" value={draft.q} onChange={(event) => update('q', event.target.value)} />
           </FormField>
-          <FormField id="publication-venue" label="Venue" hint="Matches part of the venue name.">
+          <FormField id="publication-venue" label="Venue or conference" hint="Matches part of the venue or conference name.">
             <input id="publication-venue" value={draft.venue} onChange={(event) => update('venue', event.target.value)} />
           </FormField>
           <FormField id="publication-author" label="Author">

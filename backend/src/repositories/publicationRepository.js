@@ -15,6 +15,7 @@ SELECT
   p.published_at,
   p.created_at,
   p.updated_at,
+  creator.full_name AS created_by_name,
   (
     SELECT COALESCE(json_agg(json_build_object(
       'id', ra.id, 'slug', ra.slug, 'name', ra.name::text,
@@ -33,6 +34,7 @@ SELECT
     WHERE pa.publication_id = p.id
   ) AS authors
 ${PUB_FROM}
+JOIN users creator ON creator.id = p.created_by_user_id
 `;
 
 async function insertPublication(db, row) {

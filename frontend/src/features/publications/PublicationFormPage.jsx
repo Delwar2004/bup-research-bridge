@@ -120,7 +120,19 @@ export function PublicationFormPage({ mode }) {
         setDirectoryNote(peoplePayload.truncated
           ? 'The person list shows the first 100 faculty, alumni, and student profiles.'
           : '');
-        if (!editing) return;
+        if (!editing) {
+          if (user?.id && ['student', 'faculty', 'alumni'].includes(user.role)) {
+            setForm((current) => (
+              current.authors.length
+                ? current
+                : {
+                  ...current,
+                  authors: [nextAuthor({ userId: user.id, authorOrder: '1', fullName: user.fullName })],
+                }
+            ));
+          }
+          return;
+        }
         const payload = await getPublication(publicationId);
         if (cancelled) return;
         const item = payload.data;
@@ -202,6 +214,9 @@ export function PublicationFormPage({ mode }) {
     }
     if (conference && form.authors.length === 0 && !errors.authors) {
       errors.authors = 'Add at least one author.';
+    }
+    if (conference && form.moderationStatus === 'pending' && form.researchAreaIds.length === 0) {
+      errors.researchAreaIds = 'Choose at least one research area before sending a conference paper for review.';
     }
     return errors;
   }
@@ -346,6 +361,7 @@ export function PublicationFormPage({ mode }) {
         ) : null}
         <fieldset className="field">
           <legend>Research areas</legend>
+          {conference ? <p className="field-hint">Optional while this stays a draft. Required before an administrator can approve it, and required here if you send it for review.</p> : null}
           {areas.length === 0 ? <p className="empty-state">No active research areas are available.</p> : (
             <ul className="choice-list">
               {areas.map((area) => (
