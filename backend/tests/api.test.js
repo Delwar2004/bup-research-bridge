@@ -349,6 +349,65 @@ test('publications, repository search, and admin report', async () => {
   assert.equal(shared.body.data.length, 1);
 });
 
+test('a student can record a conference-shaped publication and a project', async () => {
+  const token = await adminToken();
+  await register('student', { batch: 'BICE-2024', researchAreaIds: [ML] });
+  const studentId = await activate(token, 'student@bup.test');
+  const studentLogin = await login('student@bup.test');
+  const studentToken = studentLogin.body.data.accessToken;
+
+  const anon = await request(app).get('/api/v1/students');
+  assert.equal(anon.status, 401);
+
+  const listed = await request(app)
+    .get('/api/v1/students')
+    .query({ researchAreaId: ML })
+    .set('Authorization', `Bearer ${studentToken}`);
+  assert.equal(listed.status, 200);
+  assert.equal(listed.body.data.length, 1);
+  assert.equal(listed.body.data[0].id, studentId);
+  assert.equal(listed.body.data[0].fullName, 'student Person');
+  assert.equal(listed.body.data[0].role, 'student');
+  assert.equal(listed.body.data[0].email, undefined);
+  assert.equal(listed.body.data[0].bio, undefined);
+  assert.equal(listed.body.data[0].batch, undefined);
+
+  const publication = await request(app)
+    .post('/api/v1/publications')
+    .set('Authorization', `Bearer ${studentToken}`)
+    .send({
+      title: 'Conference paper on routing',
+      abstract: 'A short abstract.',
+      venue: 'BUP Computing Conference',
+      publicationYear: 2026,
+      authors: [{ userId: studentId, authorOrder: 1 }],
+    });
+  assert.equal(publication.status, 201);
+  assert.equal(publication.body.data.venue, 'BUP Computing Conference');
+  assert.equal(publication.body.data.createdByUserId, studentId);
+  assert.equal(publication.body.data.authors[0].userId, studentId);
+
+  const unknown = await request(app)
+    .post('/api/v1/publications')
+    .set('Authorization', `Bearer ${studentToken}`)
+    .send({ title: 'Nope', publicationType: 'conference' });
+  assert.equal(unknown.status, 422);
+
+  const project = await request(app)
+    .post('/api/v1/research-projects')
+    .set('Authorization', `Bearer ${studentToken}`)
+    .send({
+      departmentId: CSE,
+      title: 'Student routing project',
+      projectType: 'academic_project',
+      projectYear: 2026,
+      members: [{ userId: studentId, memberRole: 'author' }],
+    });
+  assert.equal(project.status, 201);
+  assert.equal(project.body.data.createdByUserId, studentId);
+  assert.equal(project.body.data.members[0].userId, studentId);
+});
+
 test('remaining contract paths for profiles, content, and administration', async () => {
   const token = await adminToken();
   await register('faculty', { designation: 'Lecturer' });

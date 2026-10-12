@@ -63,14 +63,14 @@ export function AppRoutes() {
         <Route path="research-projects" element={<ProjectListPage />} />
         <Route
           path="research-projects/new"
-          element={<RequireRole roles={['faculty', 'alumni', 'admin']}><ProjectFormPage mode="create" /></RequireRole>}
+          element={<RequireRole roles={['student', 'faculty', 'alumni', 'admin']}><ProjectFormPage mode="create" /></RequireRole>}
         />
         <Route path="research-projects/:projectId/edit" element={<ProjectFormPage mode="edit" />} />
         <Route path="research-projects/:projectId" element={<ProjectDetailPage />} />
         <Route path="publications" element={<PublicationListPage />} />
         <Route
           path="publications/new"
-          element={<RequireRole roles={['faculty', 'alumni', 'admin']}><PublicationFormPage mode="create" /></RequireRole>}
+          element={<RequireRole roles={['student', 'faculty', 'alumni', 'admin']}><PublicationFormPage mode="create" /></RequireRole>}
         />
         <Route path="publications/:publicationId/edit" element={<PublicationFormPage mode="edit" />} />
         <Route path="publications/:publicationId" element={<PublicationDetailPage />} />

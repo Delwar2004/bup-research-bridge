@@ -77,7 +77,7 @@ async function assertOpportunityVisible(db, user, opportunityId) {
 }
 
 async function create(user, body) {
-  if (!['faculty', 'alumni', 'admin'].includes(user.role)) throw forbidden();
+  if (!['student', 'faculty', 'alumni', 'admin'].includes(user.role)) throw forbidden();
   const parsed = parseBody(body, { partial: false });
   parsed.moderationStatus = assertModerationCreate(parsed.moderationStatus);
   const id = await withTransaction(async (db) => {

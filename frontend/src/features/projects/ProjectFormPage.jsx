@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ApiError } from '../../api/client';
 import { listOpportunities } from '../../api/opportunities';
-import { listAlumni, listFaculty } from '../../api/people';
+import { listPeopleDirectory, personLabel, withSelf } from '../../api/people';
 import { createProject, getProject, updateProject } from '../../api/projects';
 import { listDepartments, listResearchAreas } from '../../api/reference';
 import { useSession } from '../../auth/session';
@@ -124,28 +124,16 @@ export function ProjectFormPage({ mode }) {
         if (user?.role === 'faculty' || isAdmin) {
           opportunityCalls.push(listOpportunities({ mine: true, pageSize: 100, sort: 'title', order: 'asc' }));
         }
-        const [departmentPayload, areaPayload, facultyPayload, alumniPayload, ...opportunityPayloads] = await Promise.all([
+        const [departmentPayload, areaPayload, peoplePayload, ...opportunityPayloads] = await Promise.all([
           listDepartments(),
           listResearchAreas(),
-          listFaculty({ pageSize: 100, sort: 'fullName', order: 'asc' }),
-          listAlumni({ pageSize: 100, sort: 'fullName', order: 'asc' }),
+          listPeopleDirectory(),
           ...opportunityCalls,
         ]);
         if (cancelled) return;
         setDepartments(departmentPayload.data || []);
         setAreas(areaPayload.data || []);
-        const directory = [];
-        const seenPeople = new Set();
-        [...(facultyPayload.data || []), ...(alumniPayload.data || [])].forEach((person) => {
-          if (seenPeople.has(person.id)) return;
-          seenPeople.add(person.id);
-          directory.push({ id: person.id, fullName: person.fullName });
-        });
-        if ((user?.role === 'faculty' || user?.role === 'alumni') && user.id && !seenPeople.has(user.id)) {
-          directory.push({ id: user.id, fullName: user.fullName });
-        }
-        directory.sort((left, right) => left.fullName.localeCompare(right.fullName));
-        setPeople(directory);
+        setPeople(withSelf(peoplePayload.people, user));
         const openings = [];
         const seenOpenings = new Set();
         opportunityPayloads.forEach((payload) => {
@@ -158,13 +146,12 @@ export function ProjectFormPage({ mode }) {
         openings.sort((left, right) => left.title.localeCompare(right.title));
         setOpportunities(openings);
         const notes = [];
-        if ((facultyPayload.meta?.totalPages || 1) > 1 || (alumniPayload.meta?.totalPages || 1) > 1) {
-          notes.push('The person list shows the first 100 faculty profiles and the first 100 alumni profiles.');
+        if (peoplePayload.truncated) {
+          notes.push('The person list shows the first 100 faculty, alumni, and student profiles.');
         }
         if (opportunityPayloads.some((payload) => (payload.meta?.totalPages || 1) > 1)) {
           notes.push('The opportunity list shows the first 100 matches for each requested status.');
         }
-        notes.push('Students already listed on a project stay selectable. There is no student directory to add a new student member.');
         setDirectoryNote(notes.join(' '));
         if (!editing) return;
         const payload = await getProject(projectId);
@@ -400,7 +387,7 @@ export function ProjectFormPage({ mode }) {
         </fieldset>
         <fieldset className="field">
           <legend>Members</legend>
-          <p className="field-hint">Faculty and alumni profiles can be added. A person can appear once.</p>
+          <p className="field-hint">Students, faculty, and alumni can be added. A person can appear once.</p>
           {form.members.map((member) => (
             <div className="member-row" key={member.key}>
               <div className="field">
@@ -408,7 +395,7 @@ export function ProjectFormPage({ mode }) {
                 <select id={`${member.key}-user`} value={member.userId} onChange={(event) => updateMember(member.key, 'userId', event.target.value)}>
                   <option value="">Choose a person</option>
                   {peopleOptions.map((person) => (
-                    <option key={person.id} value={person.id}>{person.fullName}</option>
+                    <option key={person.id} value={person.id}>{personLabel(person)}</option>
                   ))}
                 </select>
               </div>
