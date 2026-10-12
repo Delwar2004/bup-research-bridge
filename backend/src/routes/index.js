@@ -58,6 +58,8 @@ router.get('/research-areas', optionalAuthenticate, handle(async (req) => {
 }, 200, 'Research areas retrieved.'));
 
 router.patch('/me/profile', authenticate, handle((req) => profileService.updateMe(req.user, req.body), 200, 'Profile updated.'));
+router.post('/me/profile-photo', authenticate, handle((req) => profileService.setPhoto(req.user, req), 200, 'Profile photo updated.'));
+router.delete('/me/profile-photo', authenticate, handle((req) => profileService.removePhoto(req.user), 200, 'Profile photo removed.'));
 router.put('/me/research-areas', authenticate, handle((req) => profileService.replaceAreas(req.user, req.body), 200, 'Research areas updated.'));
 router.get('/faculty', authenticate, handle((req) => profileService.listFaculty(req.user, req.query), 200, 'Faculty retrieved.'));
 router.get('/faculty/:userId', authenticate, uuidParam('userId'), handle((req) => profileService.getFaculty(req.params.userId), 200, 'Faculty profile retrieved.'));

@@ -6,6 +6,7 @@ import { listProjects } from '../../api/projects';
 import { listOpportunities } from '../../api/opportunities';
 import { listExperiences } from '../../api/experiences';
 import { getAlumni, getFaculty } from '../../api/people';
+import { photoSrc } from '../../api/photos';
 import { useSession } from '../../auth/session';
 import { Alert } from '../../components/Alert';
 import { LoadingState } from '../../components/LoadingState';
@@ -150,7 +151,7 @@ export function PersonPage({ kind }) {
     );
   }
 
-  const photo = httpUrl(person.profilePhotoUrl);
+  const photo = photoSrc(person.profilePhotoUrl);
   const areas = person.researchAreas || [];
 
   return (

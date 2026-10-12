@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { photoSrc } from '../api/photos';
 
 function departmentLabel(department) {
   if (!department) return 'No department listed';
@@ -16,8 +17,8 @@ export function PersonCard({ person, href, areaHref }) {
   return (
     <article className="person-card">
       <div className="person-banner">
-        {person.profilePhotoUrl ? (
-          <img src={person.profilePhotoUrl} alt="" />
+        {photoSrc(person.profilePhotoUrl) ? (
+          <img src={photoSrc(person.profilePhotoUrl)} alt="" />
         ) : (
           <span className="initials" aria-hidden="true">{initials(person.fullName)}</span>
         )}

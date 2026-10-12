@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { unreadNotificationCount } from '../api/notifications';
+import { photoSrc } from '../api/photos';
 import { useSession } from '../auth/session';
 
 const ROLE_LABEL = {
@@ -48,6 +49,12 @@ const CRUMBS = [
   ['/notifications', 'Notifications'],
   ['/profile', 'Profile'],
 ];
+
+function Avatar({ user }) {
+  const src = photoSrc(user?.profilePhotoUrl);
+  if (src) return <img className="avatar avatar-photo" src={src} alt="" />;
+  return <span className="avatar initials" aria-hidden="true">{initials(user?.fullName)}</span>;
+}
 
 function initials(name) {
   const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
@@ -197,7 +204,7 @@ export function AppLayout() {
           <button type="button" className="nav-item" onClick={logoutEverywhere}>Sign out everywhere</button>
         </nav>
         <Link className="side-profile" to="/profile" onClick={closeMenu}>
-          <span className="avatar initials" aria-hidden="true">{initials(user?.fullName)}</span>
+          <Avatar user={user} />
           <div>
             <strong>{user?.fullName}</strong>
             <span>{roleLabel}</span>
@@ -223,7 +230,7 @@ export function AppLayout() {
           <div className="top-actions">
             <NotificationButton />
             <Link className="header-profile" to="/profile">
-              <span className="avatar initials" aria-hidden="true">{initials(user?.fullName)}</span>
+              <Avatar user={user} />
               <span>
                 <strong>{user?.fullName}</strong>
                 <span>{roleLabel}</span>

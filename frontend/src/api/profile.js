@@ -10,3 +10,13 @@ export function replaceResearchAreas(researchAreaIds) {
     body: { researchAreaIds },
   });
 }
+
+export function uploadProfilePhoto(file) {
+  const formData = new FormData();
+  formData.append('photo', file);
+  return apiRequest('/me/profile-photo', { method: 'POST', formData });
+}
+
+export function removeProfilePhoto() {
+  return apiRequest('/me/profile-photo', { method: 'DELETE' });
+}
