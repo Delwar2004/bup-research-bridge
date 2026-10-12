@@ -934,3 +934,46 @@ test('validation and logout revoke refresh tokens', async () => {
   assert.equal(reused.status, 401);
   assert.ok(token);
 });
+
+test('a student can upload and remove a profile photo', async () => {
+  const token = await adminToken();
+  await register('student', { batch: 'BICE-2024' });
+  const studentId = await activate(token, 'student@bup.test');
+  const studentToken = (await login('student@bup.test')).body.data.accessToken;
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+    'base64',
+  );
+
+  const uploaded = await request(app)
+    .post('/api/v1/me/profile-photo')
+    .set('Authorization', `Bearer ${studentToken}`)
+    .attach('photo', png, { filename: 'dot.png', contentType: 'image/png' });
+  assert.equal(uploaded.status, 200);
+  assert.equal(uploaded.body.data.profilePhotoUrl, `/uploads/profile-photos/${studentId}.png`);
+
+  const file = await request(app).get(uploaded.body.data.profilePhotoUrl);
+  assert.equal(file.status, 200);
+  assert.equal(file.headers['content-type'], 'image/png');
+  assert.equal(file.body.length, png.length);
+
+  const notImage = await request(app)
+    .post('/api/v1/me/profile-photo')
+    .set('Authorization', `Bearer ${studentToken}`)
+    .attach('photo', Buffer.from('not an image'), { filename: 'note.txt', contentType: 'text/plain' });
+  assert.equal(notImage.status, 422);
+
+  const adminUpload = await request(app)
+    .post('/api/v1/me/profile-photo')
+    .set('Authorization', `Bearer ${token}`)
+    .attach('photo', png, { filename: 'dot.png', contentType: 'image/png' });
+  assert.equal(adminUpload.status, 403);
+
+  const removed = await request(app)
+    .delete('/api/v1/me/profile-photo')
+    .set('Authorization', `Bearer ${studentToken}`);
+  assert.equal(removed.status, 200);
+  assert.equal(removed.body.data.profilePhotoUrl, null);
+  const missing = await request(app).get(`/uploads/profile-photos/${studentId}.png`);
+  assert.equal(missing.status, 404);
+});

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiError } from '../../api/client';
 import { currentUser } from '../../api/auth';
-import { replaceResearchAreas, updateProfile } from '../../api/profile';
+import { photoSrc } from '../../api/photos';
+import { removeProfilePhoto, replaceResearchAreas, updateProfile, uploadProfilePhoto } from '../../api/profile';
 import { listDepartments, listResearchAreas } from '../../api/reference';
 import { useSession } from '../../auth/session';
 import { Alert } from '../../components/Alert';
@@ -20,7 +21,7 @@ function formFromAccount(account) {
     designation: account.designation || '',
     mentoringAvailability: Boolean(account.mentoringAvailability),
     currentOrganization: account.currentOrganization || '',
-    profilePhotoUrl: account.profilePhotoUrl || '',
+    profilePhotoUrl: /^https?:\/\//i.test(account.profilePhotoUrl || '') ? account.profilePhotoUrl : '',
     bio: account.bio || '',
     researchAreaIds: (account.researchAreas || []).map((area) => area.id),
   };
@@ -59,6 +60,7 @@ export function ProfilePage() {
   const [formError, setFormError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [photoPending, setPhotoPending] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -156,9 +158,9 @@ export function ProfilePage() {
     if (role === 'alumni' && nullableText(form.currentOrganization) !== (account.currentOrganization ?? null)) {
       patch.currentOrganization = nullableText(form.currentOrganization);
     }
-    if (nullableText(form.profilePhotoUrl) !== (account.profilePhotoUrl ?? null)) {
-      patch.profilePhotoUrl = nullableText(form.profilePhotoUrl);
-    }
+    const typedPhoto = nullableText(form.profilePhotoUrl);
+    const currentExternal = /^https?:\/\//i.test(account.profilePhotoUrl || '') ? account.profilePhotoUrl : null;
+    if (typedPhoto !== currentExternal) patch.profilePhotoUrl = typedPhoto;
     if (nullableText(form.bio) !== (account.bio ?? null)) {
       patch.bio = nullableText(form.bio);
     }
@@ -242,15 +244,61 @@ export function ProfilePage() {
     ...areas,
     ...(account.researchAreas || []).filter((area) => !catalogIds.has(area.id)),
   ];
-  const photo = account.profilePhotoUrl;
-  const showPhoto = typeof photo === 'string' && /^https?:\/\//i.test(photo);
+  const photo = photoSrc(account.profilePhotoUrl);
+
+  async function onPhotoFile(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setFormError('');
+    setSuccess('');
+    setFieldErrors({});
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
+      setFieldErrors({ photo: 'Choose a JPEG, PNG, WEBP, or GIF image.' });
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setFieldErrors({ photo: 'The image must be at most 2 MB.' });
+      return;
+    }
+    setPhotoPending('upload');
+    try {
+      const payload = await uploadProfilePhoto(file);
+      setAccount(payload.data);
+      applyAccount(payload.data);
+      setForm(formFromAccount(payload.data));
+      setSuccess(payload.message || 'Profile photo updated.');
+    } catch (err) {
+      setFieldErrors(fieldMap(err));
+      setFormError(err instanceof ApiError ? err.message : 'The photo could not be uploaded.');
+    } finally {
+      setPhotoPending('');
+    }
+  }
+
+  async function onRemovePhoto() {
+    setFormError('');
+    setSuccess('');
+    setPhotoPending('remove');
+    try {
+      const payload = await removeProfilePhoto();
+      setAccount(payload.data);
+      applyAccount(payload.data);
+      setForm(formFromAccount(payload.data));
+      setSuccess(payload.message || 'Profile photo removed.');
+    } catch (err) {
+      setFormError(err instanceof ApiError ? err.message : 'The photo could not be removed.');
+    } finally {
+      setPhotoPending('');
+    }
+  }
 
   return (
     <section className="panel">
       <p className="eyebrow">Account</p>
       <h1>Your profile</h1>
       <p>Update the details this role is allowed to change. Role and account status stay with the administrator.</p>
-      {showPhoto ? <img className="profile-photo" src={photo} alt="" /> : null}
+      {photo ? <img className="profile-photo" src={photo} alt="" /> : null}
       <dl className="meta-list">
         <div>
           <dt>Role</dt>
@@ -318,7 +366,15 @@ export function ProfilePage() {
         ) : null}
         {role !== 'admin' ? (
           <>
-            <FormField id="profilePhotoUrl" label="Profile photo URL" hint="A web address. This app does not upload files." error={fieldErrors.profilePhotoUrl}>
+            <FormField id="profile-photo-file" label="Profile photo" hint="JPEG, PNG, WEBP, or GIF. At most 2 MB." error={fieldErrors.photo}>
+              <input id="profile-photo-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={onPhotoFile} disabled={Boolean(photoPending)} />
+            </FormField>
+            {photo ? (
+              <button className="button button-secondary" type="button" onClick={onRemovePhoto} disabled={Boolean(photoPending)}>
+                {photoPending === 'remove' ? 'Removing…' : 'Remove photo'}
+              </button>
+            ) : null}
+            <FormField id="profilePhotoUrl" label="Or paste an image link" hint="Optional. A web address starting with http:// or https://." error={fieldErrors.profilePhotoUrl}>
               <input id="profilePhotoUrl" type="url" value={form.profilePhotoUrl} onChange={(event) => update('profilePhotoUrl', event.target.value)} />
             </FormField>
             <FormField id="bio" label="Bio" error={fieldErrors.bio}>

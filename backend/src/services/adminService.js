@@ -8,6 +8,7 @@ const notificationRepository = require('../repositories/notificationRepository')
 const reportRepository = require('../repositories/reportRepository');
 const referenceRepository = require('../repositories/referenceRepository');
 const { insertActivity, insertNotification } = require('../repositories/audit');
+const { removeStoredPhotos, assertPhotoReference, isOwnStoredPhoto } = require('./profilePhotos');
 const {
   toPrivateAccount, toExperience, toOpportunity, toProject, toPublication, toActivity, toResearchArea,
 } = require('../utils/presenters');
@@ -234,6 +235,7 @@ async function updateProfile(actor, userId, body) {
   const parsed = parseProfilePatch(existing.role, body);
   delete parsed.fullName;
   delete parsed.email;
+  if (parsed.profilePhotoUrl !== undefined) assertPhotoReference(userId, parsed.profilePhotoUrl);
   if (!Object.keys(parsed).length) throw invalid('body', 'required', 'At least one profile field is required.');
   await withTransaction(async (db) => {
     if (parsed.departmentId) {
@@ -249,6 +251,9 @@ async function updateProfile(actor, userId, body) {
       summary: 'Administrator updated a role profile.',
     });
   });
+  if (parsed.profilePhotoUrl !== undefined && !isOwnStoredPhoto(userId, parsed.profilePhotoUrl)) {
+    removeStoredPhotos(userId);
+  }
   return toPrivateAccount(await userRepository.findProfileById({ query }, userId));
 }
 
@@ -286,6 +291,7 @@ async function deleteUser(actor, userId) {
     const removed = await userRepository.deleteUser(db, userId);
     if (!removed) throw notFound();
   });
+  removeStoredPhotos(userId);
   return { id: userId };
 }
 

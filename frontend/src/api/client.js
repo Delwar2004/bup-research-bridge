@@ -37,13 +37,18 @@ export async function apiRequest(path, options = {}) {
   const {
     method = 'GET',
     body,
+    formData,
     auth = true,
     retry = true,
   } = options;
 
   const headers = { Accept: 'application/json' };
-  if (body !== undefined) {
+  let payloadBody;
+  if (formData) {
+    payloadBody = formData;
+  } else if (body !== undefined) {
     headers['Content-Type'] = 'application/json';
+    payloadBody = JSON.stringify(body);
   }
   if (auth && accessToken) {
     headers.Authorization = `Bearer ${accessToken}`;
@@ -54,7 +59,7 @@ export async function apiRequest(path, options = {}) {
     response = await fetch(`${getApiBaseUrl()}${path}`, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: payloadBody,
     });
   } catch {
     throw new ApiError(0, 'NETWORK_ERROR', 'The server could not be reached. Check that the API is running.');
@@ -63,7 +68,7 @@ export async function apiRequest(path, options = {}) {
   if (response.status === 401 && auth && retry && refreshSession) {
     const refreshed = await refreshSession();
     if (refreshed) {
-      return apiRequest(path, { method, body, auth, retry: false });
+      return apiRequest(path, { method, body, formData, auth, retry: false });
     }
   }
 

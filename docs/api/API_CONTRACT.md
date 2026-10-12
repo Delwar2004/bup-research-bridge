@@ -408,7 +408,7 @@ Returned by directory and `GET /users/{userId}` for a visible faculty or alumni 
 | `designation` | string or null | Faculty only. |
 | `mentoringAvailability` | boolean or null | Faculty or alumni. Null otherwise. |
 | `currentOrganization` | string or null | Alumni only. |
-| `profilePhotoUrl` | string or null | URL stored on the active profile. Not a file upload. |
+| `profilePhotoUrl` | string or null | An `http://` or `https://` image address, or `/uploads/profile-photos/{userId}.{ext}` after the account uploads a picture (PROF-09). |
 | `bio` | string or null | Active profile biography. |
 | `researchAreas` | research area[] | Active role junction only. |
 | `createdAt` | date-time | `users.created_at` |
@@ -635,6 +635,8 @@ Enum values sent by clients must match the PostgreSQL labels exactly. No aliases
 | REF-01 | GET | `/departments` | No | List departments |
 | REF-02 | GET | `/research-areas` | No | List active research areas |
 | PROF-01 | PATCH | `/me/profile` | Yes | Update own name, email, and active profile |
+| PROF-09 | POST | `/me/profile-photo` | Yes | Upload a profile picture |
+| PROF-10 | DELETE | `/me/profile-photo` | Yes | Remove the profile picture |
 | PROF-02 | PUT | `/me/research-areas` | Yes | Replace own research-area links |
 | PROF-03 | GET | `/faculty` | Yes | Browse and filter faculty |
 | PROF-04 | GET | `/faculty/{userId}` | Yes | Faculty profile |
@@ -724,7 +726,7 @@ Request body, common fields:
 | `role` | string | Yes | `student`, `faculty`, or `alumni` |
 | `departmentId` | uuid | Yes | Must exist in `departments` |
 | `bio` | string | No | ≤ 5000, or null |
-| `profilePhotoUrl` | string | No | Length 1–2000, or null. URL text, not a file. |
+| `profilePhotoUrl` | string | No | Length 1–2000, or null. An `http(s)` address. A computer file is uploaded after sign-in with PROF-09. |
 | `researchAreaIds` | uuid[] | No | Each id exists and `is_active`. Duplicates rejected. At most 25. |
 
 Additional fields when `role` is `student`:
@@ -980,6 +982,41 @@ Success `200`: `data` is the AUTH-06 payload.
 Errors: `409` duplicate email. `422` department not found, empty body, or a field the role does not own.
 
 This does not write `activity_logs`. Administrative edits go through ADM-04 and ADM-06, which do.
+
+#### PROF-09 Upload profile photo
+
+| | |
+| --- | --- |
+| Method | `POST` |
+| Path | `/me/profile-photo` |
+| Purpose | Store a picture chosen on the account's computer and show it on the profile. |
+| Authentication | Yes |
+| Roles | `student`, `faculty`, `alumni` |
+| Database | `profile_photo_url` on the active role profile. The file is stored by the API and served at `/uploads/profile-photos/{userId}.{ext}`. |
+| Requirements | Profile photo on the active profile. |
+
+Body: `multipart/form-data` with one file field named `photo`. JPEG, PNG, WEBP, or GIF. At most 2 MB. The type is taken from the file bytes, not the filename.
+
+Success `200`: private account. `profilePhotoUrl` is `/uploads/profile-photos/{userId}.jpg`, `.png`, `.webp`, or `.gif`.
+
+The picture can be loaded in a browser without an access token, because an image tag does not send `Authorization`. The path contains the account id.
+
+Errors: `403` administrators. `422` when the field is missing, the file is too large, or the bytes are not one of those image types.
+
+A previous uploaded file for that account is replaced. Pasting an `http(s)` address through PROF-01 still works and removes the uploaded file.
+
+#### PROF-10 Remove profile photo
+
+| | |
+| --- | --- |
+| Method | `DELETE` |
+| Path | `/me/profile-photo` |
+| Authentication | Yes |
+| Roles | `student`, `faculty`, `alumni` |
+
+No body. Sets `profilePhotoUrl` to null and deletes an uploaded file for that account.
+
+Success `200`: private account with `profilePhotoUrl: null`. `403` for administrators.
 
 #### PROF-02 Replace own research areas
 

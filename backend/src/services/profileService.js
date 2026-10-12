@@ -10,6 +10,7 @@ const {
   likePattern, asBoolean, asDate,
 } = require('../validators/common');
 const { assertDepartment, assertActiveAreas, assertKnownAreas } = require('./rules');
+const photos = require('./profilePhotos');
 
 const PROFILE_FIELDS = {
   student: ['fullName', 'email', 'departmentId', 'batch', 'profilePhotoUrl', 'bio'],
@@ -44,11 +45,30 @@ function parseProfilePatch(role, body) {
 
 async function updateMe(user, body) {
   const parsed = parseProfilePatch(user.role, body);
+  if (parsed.profilePhotoUrl !== undefined) photos.assertPhotoReference(user.id, parsed.profilePhotoUrl);
   await withTransaction(async (db) => {
     if (parsed.departmentId) await assertDepartment(db, parsed.departmentId);
     await userRepository.updateUserAccount(db, user.id, parsed);
     if (user.role !== 'admin') await userRepository.updateRoleProfile(db, user.role, user.id, parsed);
   });
+  if (parsed.profilePhotoUrl !== undefined && !photos.isOwnStoredPhoto(user.id, parsed.profilePhotoUrl)) {
+    photos.removeStoredPhotos(user.id);
+  }
+  return toPrivateAccount(await userRepository.findProfileById({ query }, user.id));
+}
+
+async function setPhoto(user, req) {
+  if (user.role === 'admin') throw forbidden();
+  const buffer = await photos.readUploadedPhoto(req);
+  const profilePhotoUrl = photos.savePhoto(user.id, buffer);
+  await userRepository.updateRoleProfile({ query }, user.role, user.id, { profilePhotoUrl });
+  return toPrivateAccount(await userRepository.findProfileById({ query }, user.id));
+}
+
+async function removePhoto(user) {
+  if (user.role === 'admin') throw forbidden();
+  photos.removeStoredPhotos(user.id);
+  await userRepository.updateRoleProfile({ query }, user.role, user.id, { profilePhotoUrl: null });
   return toPrivateAccount(await userRepository.findProfileById({ query }, user.id));
 }
 
@@ -235,6 +255,8 @@ async function removeExperience(user, experienceId) {
 
 module.exports = {
   updateMe,
+  setPhoto,
+  removePhoto,
   replaceAreas,
   listFaculty,
   listAlumni,
