@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>BUP Research Bridge</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 16mm 16mm 18mm 16mm;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 12pt;
+      line-height: 1.45;
+      color: #111;
+    }
+
+    .cover {
+      height: 248mm;
+      text-align: center;
+      padding-top: 8mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .dept p {
+      margin: 0.12em 0;
+      font-size: 14pt;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 24mm 0 22mm;
+      font-size: 22pt;
+      font-weight: 700;
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    .label {
+      margin: 0 0 4mm;
+      font-size: 13pt;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .people {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 18mm;
+    }
+
+    .people td {
+      vertical-align: top;
+      text-align: center;
+      padding: 0 3mm;
+      font-size: 11pt;
+      line-height: 1.35;
+    }
+
+    .people strong {
+      display: block;
+      margin-bottom: 1mm;
+      font-size: 12pt;
+    }
+
+    .people p {
+      margin: 0;
+      text-align: center;
+    }
+
+    .prepared {
+      margin-bottom: 16mm;
+    }
+
+    .prepared td {
+      width: 50%;
+      padding-bottom: 7mm;
+      font-size: 12pt;
+    }
+
+    .prepared strong {
+      font-size: 12pt;
+    }
+
+    .date {
+      margin: 6mm 0 0;
+      font-size: 13pt;
+      text-align: center;
+    }
+
+    h2 {
+      margin: 0 0 0.55em;
+      font-size: 13.5pt;
+      font-weight: 700;
+      line-height: 1.3;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    h3 {
+      margin: 0.95em 0 0.35em;
+      font-size: 12.5pt;
+      font-weight: 700;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    p {
+      margin: 0 0 0.65em;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin: 0.15em 0 0.75em;
+      padding-left: 1.25em;
+    }
+
+    li {
+      margin: 0.18em 0;
+      text-align: justify;
+    }
+
+    ol.reasons > li {
+      margin: 0.45em 0;
+    }
+
+    strong.lead {
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <div class="dept">
+      <p>Department of Information and Communication Technology</p>
+      <p>Faculty of Science and Technology</p>
+      <p>Bangladesh University of Professionals</p>
+    </div>
+
+    <h1>BUP Research Bridge</h1>
+
+    <p class="label">Supervised by:</p>
+    <table class="people">
+      <tr>
+        <td>
+          <strong>Nazneen Akter</strong>
+          <p>Assistant Professor</p>
+          <p>Department of ICT, FST</p>
+          <p>Bangladesh University of Professionals</p>
+        </td>
+        <td>
+          <strong>Suman Saha</strong>
+          <p>Assistant Professor</p>
+          <p>Department of IT&amp;RE</p>
+          <p>University of Frontier Technology, Bangladesh</p>
+        </td>
+      </tr>
+    </table>
+
+    <p class="label">Prepared by:</p>
+    <table class="people prepared">
+      <tr>
+        <td>
+          <strong>S.M. Nabil Mashrafi</strong>
+          <p>ID: 23549009080</p>
+          <p>BICE-2023</p>
+        </td>
+        <td>
+          <strong>Md Delwar Husen</strong>
+          <p>ID: 24549010076</p>
+          <p>BICE-2024</p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>Mohammad Shahriar Shefat</strong>
+          <p>ID: 24549010080</p>
+          <p>BICE-2024</p>
+        </td>
+        <td>
+          <strong>Nabil Hasan Evan</strong>
+          <p>ID: 24549010082</p>
+          <p>BICE-2024</p>
+        </td>
+      </tr>
+    </table>
+
+    <p class="date">Date of Submission: 12-10-2026</p>
+  </section>
+
+  <h2>BUP Research Bridge</h2>
+  <h2>1. Architecture &amp; Justify:</h2>
+  <h3>Selected Architecture: Three-Tier Architecture</h3>
+  <p>
+    For BUP Research Bridge, we have selected Three-Tier Architecture as the system architecture.
+    This architecture divides the system into three logically independent layers: the Presentation
+    Layer, the Application Layer, and the Database Layer. Each layer has its own responsibility.
+    The separation makes the platform easier to maintain, modify, test, and extend.
+  </p>
+  <p>
+    BUP Research Bridge is a web-based research platform for the Computer Science and Engineering
+    (CSE) and Information and Communication Technology (ICT) departments of Bangladesh University
+    of Professionals. Students in these departments often have to look through departmental pages,
+    personal profiles, and informal channels to find a supervisor, a thesis opportunity, a faculty
+    research interest, a previous thesis, or an alumnus with relevant experience. The platform
+    gathers that information in one place.
+  </p>
+  <p>
+    The system serves four roles: student, faculty, alumni, and administrator. A student looks for
+    people, opportunities, and earlier work. A faculty member or alumnus maintains a research
+    profile and can respond to a mentorship request. An administrator moderates records, manages
+    accounts, and reads activity reports. The same business rules and the same database support
+    every role, while each role sees a different set of screens. Separating the interface, the
+    business rules, and the stored data is appropriate for this division of work.
+  </p>
+
+  <h3>1. Presentation Layer</h3>
+  <p>
+    The Presentation Layer is the user interface. It is built with React.js, HTML5, CSS3, and
+    JavaScript.     Screens are reusable React components, styled with plain CSS and the Manrope and
+    DM Sans typefaces. Users open the platform in a modern web browser.
+  </p>
+  <p>This layer provides the screens used for the platform’s main activities, including:</p>
+  <ul>
+    <li>Registration and sign-in</li>
+    <li>Dashboards for students, faculty members, alumni, and administrators</li>
+    <li>Faculty and alumni directories</li>
+    <li>Research-area browsing</li>
+    <li>Thesis and research opportunity listings</li>
+    <li>Publication records, including conference papers entered as publication details</li>
+    <li>The previous-research and thesis repository</li>
+    <li>Research project records</li>
+    <li>Mentorship requests and messages</li>
+    <li>Notifications</li>
+    <li>Search and filters</li>
+    <li>Profile management, including a profile photograph</li>
+    <li>Administrative moderation, account management, activity logs, and reports</li>
+  </ul>
+  <p>
+    A student, faculty member, or alumnus can upload a profile photograph from the computer.
+    The accepted file types are JPEG, PNG, WEBP, and GIF, and the file may be at most 2 MB.
+    A profile may instead keep an optional web address for a photograph. Administrator accounts
+    do not have a profile photograph.
+  </p>
+  <p>
+    The Presentation Layer does not read or write the database. When a user acts, React sends
+    the request to the Application Layer through the REST interface at <em>/api/v1</em>. The
+    project proposal identifies React.js for the user interface and a REST API for communication
+    between that interface and the server.
+  </p>
+
+  <h3>2. Application Layer</h3>
+  <p>
+    The Application Layer is the processing layer of the system. It is implemented with Node.js
+    and Express.js. It exposes the REST API at <em>/api/v1</em> and applies the platform’s rules
+    before any data is stored or returned.
+  </p>
+  <p>This layer manages the operations that give the platform its behaviour, including:</p>
+  <ul>
+    <li>Registration and sign-in, with passwords stored as bcrypt hashes and sessions issued as JSON Web Tokens</li>
+    <li>Role-based access for student, faculty, alumni, and administrator accounts</li>
+    <li>Profiles, departments, and research areas</li>
+    <li>Thesis and research opportunities</li>
+    <li>Publications, authors, and the previous-research repository</li>
+    <li>Research projects and project members</li>
+    <li>Mentorship requests, messages, and notifications</li>
+    <li>Search and filtering</li>
+    <li>Moderation of submitted records</li>
+    <li>Account administration, including deletion of an account</li>
+    <li>Activity logs and administrative reports</li>
+  </ul>
+  <p>
+    Students, faculty members, alumni, and administrators can create publication records and
+    research projects. A conference paper is stored as a publication record: the conference name
+    is kept as the venue, together with the title, abstract, publication year, and at least one
+    author. The platform keeps this metadata and an optional web address. It does not upload a
+    paper file, and it does not run manuscript review or conference management. An author or a
+    project member must be an existing student, faculty member, or alumnus. The list used to
+    choose that person returns the name, role, and department, and does not return an email
+    address.
+  </p>
+  <p>
+    An administrator can delete another user’s account. The signed-in administrator cannot delete
+    that same account, and the last remaining administrator account cannot be deleted. Related
+    mentorship records are removed with the account. A publication or project that still has
+    another author or member is kept and assigned to that remaining person. Activity log entries
+    written by the deleted user are retained.
+  </p>
+  <p>
+    For example, when a student submits a mentorship request, the React screen sends the request
+    to Express. The API accepts the request only from an active student. It checks that the chosen
+    mentor is an active faculty member or alumnus, and it validates the subject and the message.
+    If the request names a thesis opportunity, that opportunity must already be approved and open.
+    PostgreSQL then stores the request and the first message, and the Application Layer records a
+    notification for the mentor. The browser does not write to the database, and it does not
+    notify the mentor by itself.
+  </p>
+  <p>
+    The project proposal identifies Node.js with Express.js for server-side processing, business
+    rules, and the REST API that connects the interface to the data. Full manuscript submission
+    and review, conference organisation, journal integration, payments, video sessions, and a
+    mobile application remain outside the scope stated in the proposal.
+  </p>
+
+  <h3>3. Database Layer</h3>
+  <p>
+    The Database Layer stores, retrieves, and protects the platform’s data. The database
+    management system is PostgreSQL.
+  </p>
+  <p>It holds the records the platform depends on, including:</p>
+  <ul>
+    <li>User accounts and roles</li>
+    <li>Student, faculty, and alumni profiles</li>
+    <li>Departments</li>
+    <li>Research areas</li>
+    <li>Publications and their authors</li>
+    <li>Research projects and their members</li>
+    <li>Thesis and research opportunities</li>
+    <li>Mentorship requests and messages</li>
+    <li>Notifications</li>
+    <li>Activity logs</li>
+    <li>Refresh tokens used to renew a signed-in session</li>
+  </ul>
+  <p>
+    Users do not connect to PostgreSQL themselves. Every read and every write passes through the
+    Application Layer, which checks the caller’s role and the state of the record before the
+    database changes. Database constraints keep related records consistent. A person can be stored
+    as a publication author or a project member only when that person has a student, faculty, or
+    alumni profile. An approved publication or project is expected to keep at least one research
+    area and at least one author or member.
+  </p>
+  <p>
+    The project proposal selects PostgreSQL because it is reliable, protects data integrity, and
+    handles the structured records of a research platform: profiles, publications, opportunities,
+    and mentorship.
+  </p>
+
+  <h3>Justification for Selecting Three-Tier Architecture</h3>
+  <p>We selected Three-Tier Architecture for the following reasons:</p>
+  <ol class="reasons">
+    <li>
+      <span class="lead">Separation of concerns:</span>
+      Each layer has a specific responsibility. The user interface, the business rules, and the
+      data remain logically separate. React renders screens. Express decides whether a request is
+      allowed. PostgreSQL stores the result.
+    </li>
+    <li>
+      <span class="lead">Maintainability:</span>
+      A change in one layer can be made with limited effect on the others. The visual design of a
+      directory or a form can change without changing the database tables. A validation rule can
+      change in the API without asking users to open the database.
+    </li>
+    <li>
+      <span class="lead">Scalability:</span>
+      The architecture is a structured base for later research, reporting, or administrative
+      features. New screens can call the same API, and new API rules can use the same database,
+      without collapsing the three responsibilities into one program.
+    </li>
+    <li>
+      <span class="lead">Security:</span>
+      Users do not open the database. Sign-in, role checks, and validation happen in the
+      Application Layer before a query runs. Passwords are stored as bcrypt hashes. A session
+      uses a short-lived access token and a separate refresh token. An uploaded profile
+      photograph is accepted only after its type and size have been checked.
+    </li>
+    <li>
+      <span class="lead">Modularity:</span>
+      Profiles, opportunities, publications, projects, mentorship, notifications, search, and
+      administration are organised as modules behind the API. That organisation makes development
+      and later maintenance easier than placing every rule inside the web pages.
+    </li>
+    <li>
+      <span class="lead">Suitability for the technology stack:</span>
+      The architecture matches the technologies selected in the project proposal:
+      React.js, HTML5, CSS3, and JavaScript → Node.js with Express.js → PostgreSQL.
+    </li>
+    <li>
+      <span class="lead">Easier team development:</span>
+      The platform contains several modules and is being developed collaboratively by a
+      four-member team. Separating the interface, the API, and the database lets members work on
+      different parts in an organised way. Git and GitHub record those changes. The proposal
+      organises the work across a ten-week schedule of requirement analysis, system design,
+      database design, implementation, testing, deployment, documentation, and final presentation.
+    </li>
+  </ol>
+
+  <h2>2. Methodology &amp; Justify:</h2>
+  <h3>Selected Methodology: Agile Scrum</h3>
+  <p>
+    For BUP Research Bridge, we have selected the Agile Scrum methodology as the software
+    development methodology. The project proposal adopts Agile Scrum because the platform has
+    several modules and four kinds of users, and because the detail of a feature can be checked
+    against the requirements while that feature is being built.
+  </p>
+  <p>
+    According to the proposal, Agile Scrum is selected to support iterative development,
+    continuous feedback, flexibility, and team collaboration. The work is divided into smaller
+    iterations, so the team can review what has been completed and decide the next piece of work.
+    The proposal also states that weekly meetings will be held to review progress, discuss
+    problems, and plan the next tasks, and that GitHub will be used for version control and
+    collaboration. The description below follows that selection and the order in which the
+    system was built.
+  </p>
+
+  <h3>How Agile Scrum Has Been Applied</h3>
+  <p>
+    The platform has been developed incrementally, rather than as one delivery of the entire
+    system. Each iteration added a working part of Research Bridge. The iterations followed the
+    order in which the system was constructed:
+  </p>
+  <ul>
+    <li>Accounts, sign-in, and roles</li>
+    <li>Profiles, departments, and research areas</li>
+    <li>Thesis and research opportunities</li>
+    <li>Publications and the previous-research repository</li>
+    <li>Mentorship and notifications</li>
+    <li>Search, moderation, and administrative reports</li>
+    <li>Profile photographs and account administration</li>
+  </ul>
+  <p>
+    These parts belong to the requirements defined in the proposal: faculty and alumni profiles,
+    thesis opportunities, publications and projects, the previous-research repository, search,
+    authentication and role-based access, mentorship communication, notifications, activity logs,
+    and administrative reports.
+  </p>
+
+  <h3>Key Practices of Agile Scrum for This Project</h3>
+  <ol class="reasons">
+    <li>
+      <span class="lead">Iterative development:</span>
+      The system has been built through successive iterations. Each iteration delivered a defined
+      set of functions, from accounts and profiles through opportunities, publications, mentorship,
+      and administration.
+    </li>
+    <li>
+      <span class="lead">Continuous testing:</span>
+      Testing has continued during development rather than being left until the end. The backend
+      includes an automated test suite for the API. That suite runs against a separate test
+      database, so a check of the application does not wait for a final testing week and does not
+      depend on the development database.
+    </li>
+    <li>
+      <span class="lead">Regular team meetings:</span>
+      The proposal specifies weekly meetings to discuss progress, identify problems, and plan
+      upcoming work. That practice is part of the methodology selected for this project.
+    </li>
+    <li>
+      <span class="lead">Continuous requirement validation:</span>
+      Features have been compared with the proposal’s functional and non-functional requirements
+      while they were being built. The aim is that the finished platform remains aligned with the
+      needs of students, faculty members, alumni, and administrators.
+    </li>
+    <li>
+      <span class="lead">Team collaboration:</span>
+      The four members collaborate through Git and GitHub, which the proposal names as the tools
+      for version control and coordination. Work is divided by module, and changes are recorded
+      in the shared repository.
+    </li>
+    <li>
+      <span class="lead">Feedback and improvement:</span>
+      After an iteration, the result can be reviewed and the next iteration can close a gap.
+      Later iterations added conference-paper entry on the existing publication record, allowed
+      students to create publications and projects, added administrator account deletion, and
+      added profile photographs.
+    </li>
+  </ol>
+
+  <h3>Justification for Selecting Agile Scrum Methodology</h3>
+  <ol class="reasons">
+    <li>
+      <span class="lead">Suitable for a multi-module system:</span>
+      The project contains directories, opportunities, publications, the thesis repository,
+      mentorship, notifications, search, and administration. These modules can be developed one
+      after another and still form one platform.
+    </li>
+    <li>
+      <span class="lead">Supports refinement of requirements:</span>
+      When a requirement becomes more precise during development, it can enter a later iteration.
+      A student could already be named as an author. Allowing students to create publications and
+      projects, and recording a conference paper through the existing publication fields, were
+      added without replacing the database design of those records.
+    </li>
+    <li>
+      <span class="lead">Early testing and error detection:</span>
+      The API test suite, together with review during development, exposes defects before a final
+      testing stage. A failure in sign-in, moderation, or mentorship can be corrected while the
+      related module is still the focus of the work.
+    </li>
+    <li>
+      <span class="lead">Better team coordination:</span>
+      The weekly meetings specified in the proposal, together with GitHub, coordinate the four
+      members. Each member can see which module is in progress and which change has been recorded.
+    </li>
+    <li>
+      <span class="lead">Earlier use of working features:</span>
+      Sign-in, profiles, opportunities, publications, and mentorship became usable as their
+      iterations finished. The team did not have to wait until every administrative report and
+      later account feature was complete before the earlier modules could be tried.
+    </li>
+    <li>
+      <span class="lead">Appropriate for the project timeline:</span>
+      Section 8 of the proposal plans a ten-week schedule of requirement analysis, system design,
+      implementation, testing, deployment, documentation, and final presentation. Agile Scrum
+      organises those activities into manageable iterations instead of treating them as one
+      uninterrupted build.
+    </li>
+  </ol>
+</body>
+</html>
