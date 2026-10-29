@@ -48,7 +48,15 @@ button { cursor: pointer; }
 
 .skip-link:focus { top: 0.5rem; }
 
-.shell { min-height: 100vh; display: flex; flex-direction: column; }
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    linear-gradient(90deg, #061831dc 0%, #0a294bb8 48%, #0b355a6b 100%),
+    url("/bup-campus.jpg") center 48% / cover no-repeat;
+  background-attachment: fixed;
+}
 
 .public-bar,
 .site-footer {
@@ -58,11 +66,12 @@ button { cursor: pointer; }
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: linear-gradient(#102b50, #0b1f3b);
+  background: #071a32e8;
+  backdrop-filter: blur(5px);
   color: #dce7fa;
 }
 
-.site-footer { background: var(--brand-strong); font-size: 0.92rem; }
+.site-footer { background: #071a32e8; font-size: 0.92rem; }
 
 .public-bar a,
 .site-footer a { color: #f4f7fb; }
@@ -683,19 +692,14 @@ fieldset.field legend {
 
 .welcome {
   color: #fff;
-  background:
-    linear-gradient(90deg, #071c37e8 0%, #0a294bd1 52%, #0b355a96 100%),
-    url("/bup-campus.jpg") center 48% / cover no-repeat;
-  border-radius: 19px;
+  background: transparent;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 30px;
-  min-height: 300px;
+  min-height: calc(100vh - 230px);
   padding: 32px 34px;
   position: relative;
-  overflow: hidden;
-  box-shadow: 0 16px 35px #0f2f5329;
 }
 .welcome > div { position: relative; z-index: 1; }
 .welcome h1 { color: #fff; letter-spacing: -1px; margin: 12px 0 8px; }
@@ -736,7 +740,8 @@ fieldset.field legend {
 @media (max-width: 600px) {
   .global-search span { display: none; }
   .global-search { flex: none; width: 38px; height: 38px; justify-content: center; padding: 0; margin: 0 0 0 auto; }
-  .welcome { flex-direction: column; align-items: flex-start; padding: 25px 21px; }
+  .shell { background-attachment: scroll; }
+  .welcome { flex-direction: column; align-items: flex-start; min-height: calc(100vh - 220px); padding: 25px 7px; }
   .welcome-actions { width: 100%; }
   .welcome-actions .button { flex: 1; }
 }
