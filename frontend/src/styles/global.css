@@ -684,19 +684,20 @@ fieldset.field legend {
 .welcome {
   color: #fff;
   background:
-    radial-gradient(circle at 83% 18%, #39bbed47, transparent 22%),
-    linear-gradient(122deg, #102a4e 0%, #103968 58%, #0f5f86 100%);
+    linear-gradient(90deg, #071c37e8 0%, #0a294bd1 52%, #0b355a96 100%),
+    url("/bup-campus.jpg") center 48% / cover no-repeat;
   border-radius: 19px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 30px;
-  min-height: 200px;
+  min-height: 300px;
   padding: 32px 34px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 16px 35px #0f2f5329;
 }
+.welcome > div { position: relative; z-index: 1; }
 .welcome h1 { color: #fff; letter-spacing: -1px; margin: 12px 0 8px; }
 .welcome p { color: #c5d6e9; max-width: 640px; }
 .welcome .eyebrow { color: #aad2ed; }
