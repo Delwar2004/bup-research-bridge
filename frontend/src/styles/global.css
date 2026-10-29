@@ -701,6 +701,16 @@ fieldset.field legend {
   padding: 32px 34px;
   position: relative;
 }
+.app-shell .welcome {
+  background:
+    radial-gradient(circle at 83% 18%, #39bbed47, transparent 22%),
+    linear-gradient(122deg, #102a4e 0%, #103968 58%, #0f5f86 100%);
+  border-radius: 19px;
+  min-height: 200px;
+  padding: 32px 34px;
+  overflow: hidden;
+  box-shadow: 0 16px 35px #0f2f5329;
+}
 .welcome > div { position: relative; z-index: 1; }
 .welcome h1 { color: #fff; letter-spacing: -1px; margin: 12px 0 8px; }
 .welcome p { color: #c5d6e9; max-width: 640px; }
@@ -742,6 +752,7 @@ fieldset.field legend {
   .global-search { flex: none; width: 38px; height: 38px; justify-content: center; padding: 0; margin: 0 0 0 auto; }
   .shell { background-attachment: scroll; }
   .welcome { flex-direction: column; align-items: flex-start; min-height: calc(100vh - 220px); padding: 25px 7px; }
+  .app-shell .welcome { min-height: 200px; padding: 25px 21px; }
   .welcome-actions { width: 100%; }
   .welcome-actions .button { flex: 1; }
 }
