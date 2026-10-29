@@ -10,10 +10,7 @@ export function PublicLayout() {
       <header className="public-bar">
         <Link className="logo" to="/">
           <span className="logo-mark" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 18 18">
-              <path d="M3 13.5V4.8L9 2.2l6 2.6v8.7L9 16.2 3 13.5Z" fill="none" stroke="currentColor" strokeWidth="1.4" />
-              <path d="M9 2.4v13.6M3.2 5.2 9 8.2l5.8-3" fill="none" stroke="currentColor" strokeWidth="1.4" />
-            </svg>
+            <img className="brand-logo" src="/bup-logo.png" alt="" />
           </span>
           <span>
             <strong>Research Bridge</strong>

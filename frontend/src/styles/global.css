@@ -1,19 +1,19 @@
 :root {
   color-scheme: light;
-  --ink: #142a49;
-  --muted: #6e7c91;
-  --line: #e3e8ef;
-  --paper: #f5f7fb;
+  --ink: #173a2b;
+  --muted: #65786d;
+  --line: #dce7df;
+  --paper: #f3f7f3;
   --surface: #ffffff;
-  --brand: #102b50;
-  --brand-strong: #0b1f3b;
-  --accent: #1670e9;
+  --brand: #0b633f;
+  --brand-strong: #06442d;
+  --accent: #8b6507;
   --danger: #9a3040;
   --danger-bg: #fdecee;
   --success: #148267;
   --success-bg: #e8f7f2;
-  --focus: #1268e8;
-  --shadow: 0 5px 18px #192d5209;
+  --focus: #b88912;
+  --shadow: 0 5px 18px #173d2b0d;
   --sidebar: 250px;
   font-family: "DM Sans", "Segoe UI", sans-serif;
   line-height: 1.5;
@@ -53,7 +53,7 @@ button { cursor: pointer; }
   display: flex;
   flex-direction: column;
   background:
-    linear-gradient(90deg, #061831dc 0%, #0a294bb8 48%, #0b355a6b 100%),
+    linear-gradient(90deg, #032e20df 0%, #0a4d36bd 48%, #0b714c70 100%),
     url("/bup-campus.jpg") center 48% / cover no-repeat;
   background-attachment: fixed;
 }
@@ -66,12 +66,12 @@ button { cursor: pointer; }
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
-  background: #071a32e8;
+  background: #043b29ed;
   backdrop-filter: blur(5px);
-  color: #dce7fa;
+  color: #edf6ef;
 }
 
-.site-footer { background: #071a32e8; font-size: 0.92rem; }
+.site-footer { background: #043b29ed; font-size: 0.92rem; }
 
 .public-bar a,
 .site-footer a { color: #f4f7fb; }
@@ -119,7 +119,7 @@ button { cursor: pointer; }
 
 h1 {
   margin: 0 0 0.75rem;
-  color: #142a49;
+  color: var(--ink);
   letter-spacing: -0.04em;
   font-size: clamp(1.7rem, 2vw + 1rem, 2.35rem);
   line-height: 1.15;
@@ -137,7 +137,7 @@ h1 {
   justify-content: center;
   gap: 8px;
   min-height: 39px;
-  background: #1670e9;
+  background: var(--brand);
   color: white;
   border: 1px solid transparent;
   border-radius: 9px;
@@ -150,16 +150,16 @@ h1 {
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
-.button:hover { background: #1268d5; text-decoration: none; transform: translateY(-1px); box-shadow: 0 7px 17px #1268e829; }
+.button:hover { background: #085436; text-decoration: none; transform: translateY(-1px); box-shadow: 0 7px 17px #0b633f2e; }
 .button:disabled { opacity: 0.7; cursor: wait; transform: none; }
 
 .button-secondary {
   background: white;
-  color: #27415f;
-  border-color: #dfe6ee;
+  color: #28513e;
+  border-color: #d9e5dc;
 }
 
-.button-secondary:hover { background: #f5f7fa; color: #142a49; }
+.button-secondary:hover { background: #f1f6f2; color: var(--ink); }
 
 .field { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.9rem; }
 .field label { font-weight: 600; }
@@ -246,7 +246,7 @@ fieldset.field legend {
 }
 
 .category-card {
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 1.1rem;
   background: var(--surface);
@@ -265,7 +265,7 @@ fieldset.field legend {
 .category-tabs span { color: var(--muted); }
 
 .category-tabs a {
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 999px;
   padding: 0.4rem 0.75rem;
   color: var(--ink);
@@ -275,7 +275,7 @@ fieldset.field legend {
 .category-tabs a:hover,
 .category-tabs a.active {
   border-color: var(--brand);
-  background: #eef6ff;
+  background: #edf7ef;
   color: var(--brand);
 }
 
@@ -343,11 +343,11 @@ fieldset.field legend {
 .record-card,
 .record-list li {
   background: #fff;
-  border: 1px solid #e3e8ef;
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 1rem;
   overflow-wrap: anywhere;
-  box-shadow: 0 5px 18px #192d5209;
+  box-shadow: var(--shadow);
 }
 
 .person-card { padding: 0 0 1rem; overflow: hidden; }
@@ -357,8 +357,8 @@ fieldset.field legend {
   height: 92px;
   padding: 0 1rem 0.7rem;
   background:
-    radial-gradient(circle at 85% 20%, #39bbed47, transparent 42%),
-    linear-gradient(122deg, #102a4e, #0f5f86);
+    radial-gradient(circle at 85% 20%, #e0b33f59, transparent 42%),
+    linear-gradient(122deg, #075036, #0c7650);
 }
 .person-banner img,
 .person-banner .initials {
@@ -418,10 +418,10 @@ fieldset.field legend {
 }
 
 .tag {
-  background: #e7f8fb;
-  border: 1px solid #c9edf3;
+  background: #e8f5ec;
+  border: 1px solid #cde7d5;
   border-radius: 20px;
-  color: #0d728c;
+  color: #0b6844;
   display: inline-block;
   padding: 4px 8px;
   font-size: 12px;
@@ -429,7 +429,7 @@ fieldset.field legend {
   text-decoration: none;
 }
 
-.tag:hover { text-decoration: none; background: #d8f3f8; }
+.tag:hover { text-decoration: none; background: #d8eedf; }
 
 .count { color: var(--muted); font-weight: 500; }
 
@@ -508,8 +508,8 @@ fieldset.field legend {
 
 .sidebar {
   z-index: 30;
-  color: #dce7fa;
-  background: linear-gradient(#102b50 0%, #0b1f3b 100%);
+  color: #dcebe1;
+  background: linear-gradient(#0a5036 0%, #043523 100%);
   display: flex;
   flex-direction: column;
   width: var(--sidebar);
@@ -524,21 +524,25 @@ fieldset.field legend {
 .logo { display: flex; align-items: center; gap: 11px; color: inherit; text-decoration: none; }
 .logo:hover { text-decoration: none; }
 .logo-mark {
-  color: #fff;
-  background: linear-gradient(145deg, #1676ef, #04a4cc);
-  border-radius: 11px;
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  box-shadow: 0 5px 18px #087ce74d;
+  width: 42px;
+  height: 46px;
+  flex: none;
+}
+.brand-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 5px #021c123d);
 }
 .logo > span:last-child strong { color: #fff; letter-spacing: -0.3px; font-size: 15px; display: block; }
-.logo > span:last-child > span { color: #73c5ff; letter-spacing: 2.7px; margin-top: 2px; font-size: 9px; font-weight: 700; display: block; }
+.logo > span:last-child > span { color: #e6bd45; letter-spacing: 2.7px; margin-top: 2px; font-size: 9px; font-weight: 700; display: block; }
 
 .sidebar nav { display: flex; flex-direction: column; gap: 3px; }
 .nav-caption {
-  color: #7186a5;
+  color: #86a997;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   padding: 0 13px 9px;
@@ -548,7 +552,7 @@ fieldset.field legend {
 .secondary-caption { margin-top: 17px; }
 
 .nav-item {
-  color: #aebdd3;
+  color: #b7ccbf;
   text-align: left;
   background: transparent;
   border: 0;
@@ -565,13 +569,13 @@ fieldset.field legend {
 .nav-item:hover { color: #fff; background: #ffffff0e; text-decoration: none; }
 .nav-item.active {
   color: #fff;
-  background: linear-gradient(90deg, #1976ed47, #1976ed1f);
-  box-shadow: inset 3px 0 #35b9ff;
+  background: linear-gradient(90deg, #d7a92838, #2c8b5c24);
+  box-shadow: inset 3px 0 #e5b83c;
 }
 .nav-count {
   margin-left: auto;
-  color: #bfe5ff;
-  background: #32a6f338;
+  color: #ffe9a4;
+  background: #d9aa2838;
   border-radius: 20px;
   min-width: 20px;
   height: 20px;
@@ -594,15 +598,15 @@ fieldset.field legend {
 .side-profile:hover { text-decoration: none; }
 .side-profile strong, .side-profile span { display: block; }
 .side-profile strong { color: #fff; font-size: 12px; }
-.side-profile span { color: #7f92ae; margin-top: 2px; font-size: 10px; }
+.side-profile span { color: #88a695; margin-top: 2px; font-size: 10px; }
 .side-profile div { min-width: 0; }
 .side-profile strong, .header-profile strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .avatar { border-radius: 10px; flex: none; width: 35px; height: 35px; }
-.avatar-photo { object-fit: cover; display: block; background: #d7e4f2; }
+.avatar-photo { object-fit: cover; display: block; background: #dce9e0; }
 .initials {
-  color: #dff5ff;
-  background: linear-gradient(145deg, #225b91, #178fb2);
+  color: #fff2bf;
+  background: linear-gradient(145deg, #0b6844, #159061);
   display: grid;
   place-items: center;
   font-size: 11px;
@@ -611,7 +615,7 @@ fieldset.field legend {
 
 .mobile-close, .mobile-brand { display: none; }
 .mobile-close {
-  color: #b8c8dc;
+  color: #c5d9cb;
   background: #ffffff0f;
   border: 0;
   border-radius: 9px;
@@ -626,7 +630,7 @@ fieldset.field legend {
   z-index: 20;
   backdrop-filter: blur(15px);
   background: #ffffffe6;
-  border-bottom: 1px solid #e7ebf2;
+  border-bottom: 1px solid #dfe9e2;
   display: flex;
   align-items: center;
   gap: 18px;
@@ -635,13 +639,13 @@ fieldset.field legend {
   position: sticky;
   top: 0;
 }
-.breadcrumbs { color: #8b97a9; display: flex; align-items: center; gap: 7px; min-width: 180px; font-size: 12px; }
-.breadcrumbs strong { color: #2f3d55; font-weight: 600; }
+.breadcrumbs { color: #7d9185; display: flex; align-items: center; gap: 7px; min-width: 180px; font-size: 12px; }
+.breadcrumbs strong { color: #2a493a; font-weight: 600; }
 .global-search {
-  color: #8b96a8;
+  color: #788d80;
   text-align: left;
-  background: #f5f7fa;
-  border: 1px solid #e6eaf0;
+  background: #f3f7f4;
+  border: 1px solid #e0e9e2;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -652,13 +656,13 @@ fieldset.field legend {
   font-size: 12px;
   text-decoration: none;
 }
-.global-search:hover { text-decoration: none; border-color: #cfd7e2; }
+.global-search:hover { text-decoration: none; border-color: #bbd1c2; }
 .global-search span { flex: 1; }
 .top-actions { display: flex; align-items: center; gap: 16px; }
 .icon-button {
-  color: #536078;
+  color: #466254;
   background: #fff;
-  border: 1px solid #e2e7ee;
+  border: 1px solid #dce6df;
   border-radius: 10px;
   width: 38px;
   height: 38px;
@@ -667,7 +671,7 @@ fieldset.field legend {
   text-decoration: none;
   position: relative;
 }
-.icon-button:hover { text-decoration: none; border-color: #c5d0de; }
+.icon-button:hover { text-decoration: none; border-color: #b5ccbd; }
 .bell-count {
   color: #fff;
   background: #e14f5d;
@@ -687,8 +691,8 @@ fieldset.field legend {
 .header-profile { display: flex; align-items: center; gap: 8px; color: inherit; text-decoration: none; }
 .header-profile:hover { text-decoration: none; }
 .header-profile strong, .header-profile span { display: block; }
-.header-profile strong { font-size: 12px; color: #24344c; }
-.header-profile span { color: #8590a2; font-size: 10px; }
+.header-profile strong { font-size: 12px; color: #234333; }
+.header-profile span { color: #788d81; font-size: 10px; }
 
 .welcome {
   color: #fff;
@@ -703,21 +707,21 @@ fieldset.field legend {
 }
 .app-shell .welcome {
   background:
-    radial-gradient(circle at 83% 18%, #39bbed47, transparent 22%),
-    linear-gradient(122deg, #102a4e 0%, #103968 58%, #0f5f86 100%);
+    radial-gradient(circle at 83% 18%, #e1b43c4d, transparent 24%),
+    linear-gradient(122deg, #07472f 0%, #0a6845 58%, #0d7952 100%);
   border-radius: 19px;
   min-height: 200px;
   padding: 32px 34px;
   overflow: hidden;
-  box-shadow: 0 16px 35px #0f2f5329;
+  box-shadow: 0 16px 35px #0a4b312e;
 }
 .welcome > div { position: relative; z-index: 1; }
 .welcome h1 { color: #fff; letter-spacing: -1px; margin: 12px 0 8px; }
-.welcome p { color: #c5d6e9; max-width: 640px; }
-.welcome .eyebrow { color: #aad2ed; }
+.welcome p { color: #d7e8dc; max-width: 640px; }
+.welcome .eyebrow { color: #f0ce68; }
 .welcome-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
-.welcome .button { color: #10325a; background: #fff; }
-.welcome .button:hover { background: #f3f7fb; color: #10325a; }
+.welcome .button { color: #0a5236; background: #fff; }
+.welcome .button:hover { background: #f2f8f3; color: #073f2a; }
 .welcome .button-secondary { color: #fff; background: #ffffff14; border-color: #ffffff2e; }
 .welcome .button-secondary:hover { background: #ffffff24; color: #fff; }
 
@@ -733,7 +737,7 @@ fieldset.field legend {
   .sidebar-backdrop {
     display: block;
     z-index: 29;
-    background: #0613247a;
+    background: #052a1d80;
     position: fixed;
     inset: 0;
     border: 0;
