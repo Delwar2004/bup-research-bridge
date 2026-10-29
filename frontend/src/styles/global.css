@@ -230,6 +230,46 @@ fieldset.field legend {
 
 .filter-form { margin: 1rem 0 1.25rem; }
 
+.category-grid {
+  display: grid;
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.category-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.1rem;
+  background: var(--surface);
+}
+
+.category-card h2 { margin-top: 0; }
+
+.category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 1.25rem;
+}
+
+.category-tabs span { color: var(--muted); }
+
+.category-tabs a {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.category-tabs a:hover,
+.category-tabs a.active {
+  border-color: var(--brand);
+  background: #eef6ff;
+  color: var(--brand);
+}
+
 .filter-grid {
   display: grid;
   gap: 0 0.75rem;
@@ -429,6 +469,7 @@ fieldset.field legend {
 
 @media (min-width: 720px) {
   .filter-grid { grid-template-columns: 1fr 1fr; }
+  .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .count-grid { grid-template-columns: 1fr 1fr; }
   .member-row {
     align-items: end;

@@ -7,6 +7,9 @@ const MENTORSHIP_STATUS = ['pending', 'accepted', 'rejected', 'cancelled', 'comp
 const OPPORTUNITY_TYPES = ['thesis', 'research'];
 const PROJECT_TYPES = ['thesis', 'research', 'academic_project'];
 const MEMBER_ROLES = ['supervisor', 'co_supervisor', 'author'];
+const PUBLICATION_CATEGORIES = ['journal_article', 'conference_paper', 'review_survey', 'preprint'];
+const REVIEW_TYPES = ['review', 'systematic_review', 'survey', 'meta_analysis'];
+const PUBLICATION_STATUSES = ['preprint', 'published', 'withdrawn'];
 const NOTIFICATION_TYPES = [
   'opportunity_published',
   'mentorship_requested',
@@ -31,6 +34,9 @@ module.exports = {
   OPPORTUNITY_TYPES,
   PROJECT_TYPES,
   MEMBER_ROLES,
+  PUBLICATION_CATEGORIES,
+  REVIEW_TYPES,
+  PUBLICATION_STATUSES,
   NOTIFICATION_TYPES,
   SEEDED_DEPARTMENTS,
 };

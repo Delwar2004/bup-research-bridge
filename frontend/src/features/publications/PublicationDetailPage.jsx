@@ -12,9 +12,25 @@ import { Alert } from '../../components/Alert';
 import { FormField } from '../../components/FormField';
 import { LoadingState } from '../../components/LoadingState';
 import { errorText, fieldErrorsFrom } from '../opportunities/errors';
+import {
+  PUBLICATION_STATUSES, REVIEW_TYPES, categoryLabel,
+} from './publicationCategories';
 
 function httpUrl(value) {
   return typeof value === 'string' && /^https?:\/\//i.test(value) ? value : '';
+}
+
+const REVIEW_LABELS = Object.fromEntries(REVIEW_TYPES);
+const STATUS_LABELS = Object.fromEntries(PUBLICATION_STATUSES);
+
+function MetaItem({ label, value }) {
+  if (value == null || value === '') return null;
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
 }
 
 export function PublicationDetailPage() {
@@ -113,22 +129,22 @@ export function PublicationDetailPage() {
       {notice ? <Alert tone="success">{notice}</Alert> : null}
       {error ? <Alert>{error}</Alert> : null}
       <dl className="meta-list">
-        <div>
-          <dt>Year</dt>
-          <dd>{item.publicationYear ?? 'Not listed'}</dd>
-        </div>
-        <div>
-          <dt>Venue or conference</dt>
-          <dd>{item.venue || 'Not listed'}</dd>
-        </div>
-        <div>
-          <dt>Published on</dt>
-          <dd>{item.publishedOn || 'Not listed'}</dd>
-        </div>
-        <div>
-          <dt>DOI</dt>
-          <dd>{item.doi || 'Not listed'}</dd>
-        </div>
+        <MetaItem label="Category" value={categoryLabel(item.category)} />
+        <MetaItem label={item.category === 'preprint' ? 'Posting year' : 'Publication year'} value={item.publicationYear ?? 'Not listed'} />
+        <MetaItem label="Journal name" value={item.journalName} />
+        <MetaItem label="Conference name" value={item.conferenceName} />
+        <MetaItem label="Proceedings title" value={item.proceedingsTitle} />
+        <MetaItem label="Review type" value={REVIEW_LABELS[item.reviewType]} />
+        <MetaItem label="Volume" value={item.volume} />
+        <MetaItem label="Issue" value={item.issue} />
+        <MetaItem label={item.category === 'review_survey' ? 'Page range or article number' : 'Page range'} value={item.pageRange} />
+        <MetaItem label="Publisher" value={item.publisher} />
+        <MetaItem label="Preprint server" value={item.preprintServer} />
+        <MetaItem label="Preprint ID" value={item.preprintId} />
+        <MetaItem label="Version" value={item.version} />
+        <MetaItem label="Publication status" value={STATUS_LABELS[item.publicationStatus]} />
+        <MetaItem label="Legacy venue" value={!item.category ? item.venue : null} />
+        <MetaItem label="DOI" value={item.doi} />
         <div>
           <dt>Moderation</dt>
           <dd>{item.moderationStatus}</dd>
@@ -144,6 +160,14 @@ export function PublicationDetailPage() {
           </div>
         ) : null}
       </dl>
+      {item.keywords?.length ? (
+        <>
+          <h2>Keywords</h2>
+          <ul className="tag-list">
+            {item.keywords.map((keyword) => <li className="tag" key={keyword}>{keyword}</li>)}
+          </ul>
+        </>
+      ) : null}
       <h2>Abstract</h2>
       {item.abstract ? <p className="prose">{item.abstract}</p> : <p className="empty-state">No abstract is listed.</p>}
       {item.url ? (

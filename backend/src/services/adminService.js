@@ -21,6 +21,7 @@ const {
 const { ROLES, ACCOUNT_STATUS, MODERATION } = require('../domain/constants');
 const { parseRegistration, createAccount } = require('./authService');
 const { parseProfilePatch } = require('./profileService');
+const { assertCategoryFields: assertPublicationCategoryFields } = require('./publicationService');
 const { assertActiveAreas, publishedMessage } = require('./rules');
 
 async function listUsers(queryParams) {
@@ -309,6 +310,17 @@ async function moderate(actor, kind, id, body) {
     throw conflict('The record already has that moderation status.');
   }
   if (moderationStatus === 'approved' && kind === 'publication') {
+    assertPublicationCategoryFields({
+      category: existing.category,
+      publicationYear: existing.publication_year,
+      authors: existing.authors,
+      journalName: existing.journal_name,
+      conferenceName: existing.conference_name,
+      reviewType: existing.review_type,
+      preprintServer: existing.preprint_server,
+      publicationStatus: existing.publication_status,
+      url: existing.url,
+    });
     if (!hasRows(existing.authors)) {
       throw invalid('authors', 'required', 'An approved publication must include at least one author.');
     }

@@ -5,7 +5,7 @@
 | Status | Proposed. Awaiting explicit team approval. |
 | Version | 1.0 |
 | Date | 2 October 2026 |
-| Schema source | `database/migrations/001` through `008` and `database/seed/001_reference_data.sql` |
+| Schema source | `database/migrations/001` through `009` and `database/seed/001_reference_data.sql` |
 | Requirements source | `docs/proposal/BUP_Research_bridge_project_proposal.pdf`, sections 4, 5, and 6 |
 | Implementation | Not started. This document does not add routes, controllers, or SQL. |
 
@@ -494,12 +494,21 @@ Not included: `email`, `bio`, `profilePhotoUrl`, `batch`, `researchAreas`, `stat
 | `id` | uuid | |
 | `createdByUserId` | uuid | |
 | `createdByName` | string | `users.full_name` of the recorder |
+| `category` | string or null | `journal_article`, `conference_paper`, `review_survey`, or `preprint`; null only for records created before migration 009 |
 | `title` | string | 1–500 trimmed |
 | `abstract` | string or null | 1–20000 if present |
-| `venue` | string or null | 1–300 trimmed. A conference name is stored here. |
-| `publicationYear` | integer or null | 1950–2100 |
+| `venue` | string or null | Legacy source field retained for older records |
+| `publicationYear` | integer | 1950–2100 |
+| `journalName`, `conferenceName` | string or null | Category-specific source names |
+| `proceedingsTitle` | string or null | Conference papers |
+| `volume`, `issue`, `pageRange` | string or null | Journal/review citation metadata; `pageRange` also applies to conferences |
+| `publisher` | string or null | Journal, conference, or review/survey paper |
+| `keywords` | string[] | At most 25 unique values, each at most 100 characters |
+| `reviewType` | string or null | `review`, `systematic_review`, `survey`, or `meta_analysis` |
+| `preprintServer`, `preprintId`, `version` | string or null | Preprint metadata |
+| `publicationStatus` | string or null | `preprint`, `published`, or `withdrawn` |
 | `doi` | string or null | 1–255 trimmed. Unique on `lower(doi)`. |
-| `url` | string or null | 1–2000 |
+| `url` | string or null | HTTP(S), required for a preprint |
 | `publishedOn` | date or null | `published_on` |
 | `moderationStatus` | moderation enum | |
 | `publishedAt` | date-time or null | |
@@ -1591,7 +1600,7 @@ Publication records are metadata. This API does not accept paper files, does not
 | --- | --- |
 | Method | `POST` |
 | Path | `/publications` |
-| Purpose | A student, faculty member, alumnus, or administrator records a publication. A conference paper uses this same route. |
+| Purpose | A student, faculty member, alumnus, or administrator records category-specific publication metadata. |
 | Authentication | Yes |
 | Roles | `student`, `faculty`, `alumni`, `admin` |
 | Database | `publications`, `publication_authors`, `publication_research_areas` |
@@ -1601,16 +1610,27 @@ Body:
 
 | Field | Type | Required | Validation |
 | --- | --- | --- | --- |
+| `category` | enum | Yes | `journal_article`, `conference_paper`, `review_survey`, or `preprint` |
 | `title` | string | Yes | Trimmed 1–500 |
 | `abstract` | string | No | Trimmed 1–20000 or null |
-| `venue` | string | No | Trimmed 1–300 or null |
-| `publicationYear` | integer | No | 1950–2100 or null |
+| `publicationYear` | integer | Yes | 1950–2100 |
+| `journalName` | string | By category | Required for `journal_article`; optional for `review_survey` |
+| `conferenceName` | string | By category | Required for `conference_paper`; optional for `review_survey` |
+| `proceedingsTitle` | string | No | Conference paper only; maximum 500 |
+| `volume`, `issue` | string | No | Journal article or review/survey; maximum 100 |
+| `pageRange` | string | No | Journal, conference, or review/survey; maximum 100 |
+| `publisher` | string | No | Journal, conference, or review/survey; maximum 300 |
+| `keywords` | string[] | No | At most 25 unique values, each at most 100 |
+| `reviewType` | enum | By category | Required for `review_survey`: `review`, `systematic_review`, `survey`, or `meta_analysis` |
+| `preprintServer` | string | By category | Required for `preprint`; maximum 200 |
+| `preprintId`, `version` | string | No | Preprint only |
+| `publicationStatus` | enum | By category | Required for `preprint`: `preprint`, `published`, or `withdrawn` |
 | `doi` | string | No | Trimmed 1–255. Unique on lower case. |
-| `url` | string | No | Length 1–2000 or null |
+| `url` | string | By category | Valid HTTP(S); required for `preprint`, optional otherwise |
 | `publishedOn` | date | No | |
 | `moderationStatus` | enum | No | `draft` (default) or `pending` |
 | `researchAreaIds` | uuid[] | No | Required before approval |
-| `authors` | object[] | No | Required before approval |
+| `authors` | object[] | Yes | At least one existing student, faculty member, or alumnus |
 
 Each author:
 
@@ -1619,7 +1639,7 @@ Each author:
 | `userId` | uuid | Yes | Academic profile required. Unique in the list. |
 | `authorOrder` | integer | Yes | ≥ 1. Unique in the list. |
 
-A conference paper is not a separate resource and has no `publicationType` column. The web client offers `/publications/new?kind=conference` to students, faculty, alumni, and administrators. That form still posts this body. In the client only, a conference paper requires `title`, at least one `authors` entry, `abstract`, `venue` (labeled conference name), and `publicationYear`. `doi`, `url`, and `publishedOn` stay optional. Research areas stay optional until an administrator approves the record. The API itself still accepts a publication that sends only `title`. Unknown fields, including `publicationType`, are `422`. There is no file upload.
+The client requires the user to choose a category before entering metadata, then displays only the fields that apply to that category. All four categories use the same `/publications` resource. Research areas stay optional for a draft and are required before approval. Paper files are not uploaded.
 
 Success `201`: publication object (§9.7).
 
@@ -1640,12 +1660,13 @@ Query:
 
 | Parameter | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `q` | string | No | Full text on title, abstract, venue |
+| `q` | string | No | Full text on title, abstract, legacy venue, journal, conference, proceedings, publisher, and preprint identifiers |
+| `category` | enum | No | One of the four publication categories |
 | `researchAreaId` | uuid, repeatable | No | §8.3 |
 | `researchAreaMatch` | `any` or `all` | No | |
 | `authorUserId` | uuid | No | |
 | `yearFrom`, `yearTo` | integer | No | Compared to `publication_year` |
-| `venue` | string | No | Case-insensitive substring, 1–300 |
+| `venue` | string | No | Case-insensitive substring across legacy venue, journal, conference, proceedings, publisher, and preprint server names |
 | `mine` | boolean | No | `created_by_user_id = caller` |
 | `moderationStatus` | enum | No | Admin or `mine=true` |
 | `page`, `pageSize` | integer | No | |
@@ -1745,7 +1766,7 @@ Behavior by `type`:
 | --- | --- | --- |
 | `opportunities` | `websearch_to_tsquery` on `search_vector` | Approved and `availability_status = open`, unless the caller is admin |
 | `research_projects` | same, title and description | Approved, unless admin |
-| `publications` | same, title, abstract, venue | Approved, unless admin |
+| `publications` | same, title, abstract, and category-specific source metadata | Approved, unless admin |
 | `faculty` | trigram / `ILIKE` on `full_name` | Active faculty |
 | `alumni` | trigram / `ILIKE` on `full_name` | Active alumni |
 
@@ -2424,7 +2445,7 @@ Requirement text is taken from proposal §6.1.
 | FR-04 | The system shall allow users to securely log in and log out. | `POST /auth/login`, `POST /auth/logout`, `POST /auth/logout-all` | `users`, `refresh_tokens` | All roles | Login no. Logout-all yes. | Covered |
 | FR-05 | The system shall allow faculty members to create and manage research profiles. | `POST /auth/register` with `role=faculty`, `PATCH /me/profile`, `GET /faculty/{userId}` | `users`, `faculty` | Faculty | Yes, after registration | Covered |
 | FR-06 | The system shall allow faculty members to update research interests and areas of expertise. | `PUT /me/research-areas` | `faculty_research_areas`, `research_areas` | Faculty | Yes | Covered |
-| FR-07 | The system shall allow faculty members to upload and manage publication records. | `POST/GET/PATCH /publications`, `POST /publications/{id}/submit`, `DELETE /publications/{id}` | `publications`, `publication_authors`, `publication_research_areas` | Students, faculty, and alumni create and edit their own. Administrators may create any. Everyone reads approved records. Conference papers are the same publication fields. | Yes | Covered as records, not file upload (G-11). |
+| FR-07 | The system shall allow faculty members to upload and manage publication records. | `POST/GET/PATCH /publications`, `POST /publications/{id}/submit`, `DELETE /publications/{id}` | `publications`, `publication_authors`, `publication_research_areas` | Students, faculty, and alumni create and edit their own. Administrators may create any. Everyone reads approved records. Journal articles, conference papers, review/survey papers, and preprints use category-specific metadata. | Yes | Covered as records, not file upload (G-11). |
 | FR-08 | The system shall allow faculty members to publish thesis and research opportunities. | `POST /opportunities`, `PATCH /opportunities/{id}`, `POST /opportunities/{id}/submit` | `thesis_opportunities`, `opportunity_research_areas` | Faculty. Admin may create for a faculty owner. | Yes | Covered. Public visibility waits for admin approval (FR-23). |
 | FR-09 | The system shall allow faculty members to update the status of available opportunities. | `PATCH /opportunities/{id}/availability` | `thesis_opportunities.availability_status` | Faculty owner whose current role is still faculty, and admin | Yes | Covered. Values: `open`, `closed`, `filled`. |
 | FR-10 | The system shall allow students to browse faculty profiles. | `GET /faculty`, `GET /faculty/{userId}` | `users`, `faculty`, `departments` | Student, and also the other authenticated roles | Yes | Covered |
