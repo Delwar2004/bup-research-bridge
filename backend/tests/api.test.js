@@ -286,18 +286,37 @@ test('publications, repository search, and admin report', async () => {
     .post('/api/v1/publications')
     .set('Authorization', `Bearer ${alumniToken}`)
     .send({
+      category: 'journal_article',
       title: 'Learning systems paper',
+      abstract: 'A journal article about learning systems.',
       publicationYear: 2024,
+      journalName: 'BUP Journal of Computing',
+      volume: '12',
+      issue: '2',
+      pageRange: '45-61',
+      publisher: 'BUP Press',
+      keywords: ['learning systems', 'education'],
       doi: '10.1000/test.doi',
+      url: 'https://example.test/journal-article',
       researchAreaIds: [ML],
       authors: [{ userId: alumniId, authorOrder: 1 }],
       moderationStatus: 'pending',
     });
   assert.equal(publication.status, 201);
+  assert.equal(publication.body.data.journalName, 'BUP Journal of Computing');
+  assert.equal(publication.body.data.volume, '12');
+  assert.deepEqual(publication.body.data.keywords, ['learning systems', 'education']);
   const conflict = await request(app)
     .post('/api/v1/publications')
     .set('Authorization', `Bearer ${alumniToken}`)
-    .send({ title: 'Other', doi: '10.1000/TEST.DOI' });
+    .send({
+      category: 'journal_article',
+      title: 'Other',
+      publicationYear: 2024,
+      journalName: 'Another Journal',
+      doi: '10.1000/TEST.DOI',
+      authors: [{ userId: alumniId, authorOrder: 1 }],
+    });
   assert.equal(conflict.status, 409);
 
   const project = await request(app)
@@ -376,14 +395,20 @@ test('a student can record a conference-shaped publication and a project', async
     .post('/api/v1/publications')
     .set('Authorization', `Bearer ${studentToken}`)
     .send({
+      category: 'conference_paper',
       title: 'Conference paper on routing',
       abstract: 'A short abstract.',
-      venue: 'BUP Computing Conference',
+      conferenceName: 'BUP Computing Conference',
+      proceedingsTitle: 'Proceedings of the BUP Computing Conference',
+      publisher: 'BUP Press',
+      pageRange: '101-109',
       publicationYear: 2026,
       authors: [{ userId: studentId, authorOrder: 1 }],
     });
   assert.equal(publication.status, 201);
-  assert.equal(publication.body.data.venue, 'BUP Computing Conference');
+  assert.equal(publication.body.data.category, 'conference_paper');
+  assert.equal(publication.body.data.conferenceName, 'BUP Computing Conference');
+  assert.equal(publication.body.data.proceedingsTitle, 'Proceedings of the BUP Computing Conference');
   assert.equal(publication.body.data.createdByUserId, studentId);
   assert.equal(publication.body.data.authors[0].userId, studentId);
 
@@ -408,6 +433,78 @@ test('a student can record a conference-shaped publication and a project', async
   assert.equal(project.body.data.members[0].userId, studentId);
 });
 
+test('review and preprint categories require and return their category-specific metadata', async () => {
+  const token = await adminToken();
+  await register('alumni', { batch: '2020', currentOrganization: 'BUP Lab' });
+  const alumniId = await activate(token, 'alumni@bup.test');
+  const alumniLogin = await login('alumni@bup.test');
+  const alumniToken = alumniLogin.body.data.accessToken;
+  const author = [{ userId: alumniId, authorOrder: 1 }];
+
+  const review = await request(app)
+    .post('/api/v1/publications')
+    .set('Authorization', `Bearer ${alumniToken}`)
+    .send({
+      category: 'review_survey',
+      title: 'A systematic review of research portals',
+      publicationYear: 2026,
+      reviewType: 'systematic_review',
+      journalName: 'BUP Research Review',
+      pageRange: 'Article 12',
+      keywords: ['research portal', 'systematic review'],
+      authors: author,
+    });
+  assert.equal(review.status, 201);
+  assert.equal(review.body.data.reviewType, 'systematic_review');
+  assert.deepEqual(review.body.data.keywords, ['research portal', 'systematic review']);
+
+  const invalidPreprint = await request(app)
+    .post('/api/v1/publications')
+    .set('Authorization', `Bearer ${alumniToken}`)
+    .send({
+      category: 'preprint',
+      title: 'Preprint without a URL',
+      publicationYear: 2026,
+      preprintServer: 'arXiv',
+      publicationStatus: 'preprint',
+      authors: author,
+    });
+  assert.equal(invalidPreprint.status, 422);
+
+  const preprint = await request(app)
+    .post('/api/v1/publications')
+    .set('Authorization', `Bearer ${alumniToken}`)
+    .send({
+      category: 'preprint',
+      title: 'A preprint about research discovery',
+      publicationYear: 2026,
+      preprintServer: 'arXiv',
+      preprintId: 'arXiv:2610.12345',
+      version: 'v2',
+      publicationStatus: 'preprint',
+      url: 'https://arxiv.org/abs/2610.12345',
+      authors: author,
+    });
+  assert.equal(preprint.status, 201);
+  assert.equal(preprint.body.data.preprintServer, 'arXiv');
+
+  const filtered = await request(app)
+    .get('/api/v1/publications')
+    .query({ mine: true, category: 'preprint' })
+    .set('Authorization', `Bearer ${alumniToken}`);
+  assert.equal(filtered.status, 200);
+  assert.equal(filtered.body.data.length, 1);
+  assert.equal(filtered.body.data[0].category, 'preprint');
+
+  const bySource = await request(app)
+    .get('/api/v1/publications')
+    .query({ mine: true, venue: 'arXiv' })
+    .set('Authorization', `Bearer ${alumniToken}`);
+  assert.equal(bySource.status, 200);
+  assert.equal(bySource.body.data.length, 1);
+  assert.equal(bySource.body.data[0].preprintServer, 'arXiv');
+});
+
 test('an administrator can delete another account without breaking shared publications', async () => {
   const token = await adminToken();
   const me = await request(app).get('/api/v1/auth/me').set('Authorization', `Bearer ${token}`);
@@ -428,9 +525,10 @@ test('an administrator can delete another account without breaking shared public
     .post('/api/v1/publications')
     .set('Authorization', `Bearer ${alumniToken}`)
     .send({
+      category: 'conference_paper',
       title: 'Shared conference paper',
       abstract: 'Written together.',
-      venue: 'BUP Computing Conference',
+      conferenceName: 'BUP Computing Conference',
       publicationYear: 2026,
       authors: [
         { userId: alumniId, authorOrder: 1 },
@@ -445,7 +543,10 @@ test('an administrator can delete another account without breaking shared public
     .post('/api/v1/publications')
     .set('Authorization', `Bearer ${studentToken}`)
     .send({
+      category: 'journal_article',
       title: 'Student paper with an alumni coauthor',
+      publicationYear: 2026,
+      journalName: 'Student Research Journal',
       authors: [
         { userId: studentId, authorOrder: 1 },
         { userId: alumniId, authorOrder: 2 },
@@ -457,7 +558,10 @@ test('an administrator can delete another account without breaking shared public
     .post('/api/v1/publications')
     .set('Authorization', `Bearer ${studentToken}`)
     .send({
+      category: 'journal_article',
       title: 'Student only paper',
+      publicationYear: 2026,
+      journalName: 'Student Research Journal',
       authors: [{ userId: studentId, authorOrder: 1 }],
     });
   assert.equal(solo.status, 201);
@@ -656,7 +760,13 @@ test('remaining contract paths for profiles, content, and administration', async
   const publication = await request(app)
     .post('/api/v1/publications')
     .set('Authorization', `Bearer ${facultyToken}`)
-    .send({ title: 'Draft note' });
+    .send({
+      category: 'journal_article',
+      title: 'Draft note',
+      publicationYear: 2026,
+      journalName: 'BUP Research Notes',
+      authors: [{ userId: facultyId, authorOrder: 1 }],
+    });
   assert.equal(publication.status, 201);
   const bareApprove = await request(app)
     .patch(`/api/v1/admin/publications/${publication.body.data.id}/moderation`)
@@ -846,7 +956,7 @@ test('deletes, faculty detail, search types, and activity logs', async () => {
   await register('faculty', { designation: 'Lecturer' });
   await register('alumni', { batch: '2015' });
   const facultyId = await activate(token, 'faculty@bup.test');
-  await activate(token, 'alumni@bup.test');
+  const alumniId = await activate(token, 'alumni@bup.test');
   const facultyToken = (await login('faculty@bup.test')).body.data.accessToken;
   const alumniToken = (await login('alumni@bup.test')).body.data.accessToken;
 
@@ -866,7 +976,13 @@ test('deletes, faculty detail, search types, and activity logs', async () => {
   const publication = await request(app)
     .post('/api/v1/publications')
     .set('Authorization', `Bearer ${alumniToken}`)
-    .send({ title: 'Throwaway paper' });
+    .send({
+      category: 'journal_article',
+      title: 'Throwaway paper',
+      publicationYear: 2026,
+      journalName: 'Temporary Journal',
+      authors: [{ userId: alumniId, authorOrder: 1 }],
+    });
   const publicationGone = await request(app)
     .delete(`/api/v1/publications/${publication.body.data.id}`)
     .set('Authorization', `Bearer ${alumniToken}`);

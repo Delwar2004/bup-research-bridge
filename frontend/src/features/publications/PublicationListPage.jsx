@@ -9,6 +9,9 @@ import { FormField } from '../../components/FormField';
 import { LoadingState } from '../../components/LoadingState';
 import { Pagination } from '../../components/Pagination';
 import { errorText } from '../opportunities/errors';
+import {
+  PUBLICATION_CATEGORIES, categoryLabel, publicationVenue,
+} from './publicationCategories';
 
 const MODERATION = ['draft', 'pending', 'approved', 'rejected', 'archived'];
 
@@ -22,6 +25,9 @@ function readFilters(searchParams, { canMine, isAdmin }) {
   const sort = searchParams.get('sort');
   return {
     q: searchParams.get('q') || '',
+    category: PUBLICATION_CATEGORIES.some((category) => category.value === searchParams.get('category'))
+      ? searchParams.get('category')
+      : '',
     venue: searchParams.get('venue') || '',
     authorUserId: searchParams.get('authorUserId') || '',
     yearFrom: searchParams.get('yearFrom') || '',
@@ -42,6 +48,7 @@ function readFilters(searchParams, { canMine, isAdmin }) {
 function writeFilters(filters, page = '1', { isAdmin }) {
   const params = new URLSearchParams();
   if (filters.q.trim()) params.set('q', filters.q.trim());
+  if (filters.category) params.set('category', filters.category);
   if (filters.venue.trim()) params.set('venue', filters.venue.trim());
   if (filters.authorUserId) params.set('authorUserId', filters.authorUserId);
   if (filters.yearFrom) params.set('yearFrom', filters.yearFrom);
@@ -134,6 +141,7 @@ export function PublicationListPage() {
       try {
         const payload = await listPublications({
           q: filters.q.trim() || undefined,
+          category: filters.category || undefined,
           venue: filters.venue.trim() || undefined,
           authorUserId: filters.authorUserId || undefined,
           yearFrom: filters.yearFrom || undefined,
@@ -218,17 +226,37 @@ export function PublicationListPage() {
       {referenceError ? <Alert>{referenceError}</Alert> : null}
       {referenceNote ? <p className="field-hint">{referenceNote}</p> : null}
       <div className="button-row">
-        {canManage ? <Link className="button" to="/publications/new">New publication</Link> : null}
-        {canManage ? <Link className="button button-secondary" to="/publications/new?kind=conference">New conference paper</Link> : null}
+        {canManage ? <Link className="button" to="/publications/new">Add publication</Link> : null}
         {canManage ? <Link className="button button-secondary" to="/publications?mine=true">My publications</Link> : null}
         {isAdmin ? <Link className="button button-secondary" to="/publications?moderationStatus=pending">Pending review</Link> : null}
       </div>
+      <nav className="category-tabs" aria-label="View publications by category">
+        <span>View:</span>
+        <Link className={!filters.category ? 'active' : ''} to="/publications">All</Link>
+        {PUBLICATION_CATEGORIES.map((category) => (
+          <Link
+            className={filters.category === category.value ? 'active' : ''}
+            key={category.value}
+            to={`/publications?category=${category.value}`}
+          >
+            {category.label}
+          </Link>
+        ))}
+      </nav>
       <form className="filter-form" onSubmit={onSubmit}>
         <div className="filter-grid">
           <FormField id="publication-q" label="Search" hint="Title, abstract, or venue.">
             <input id="publication-q" value={draft.q} onChange={(event) => update('q', event.target.value)} />
           </FormField>
-          <FormField id="publication-venue" label="Venue or conference" hint="Matches part of the venue or conference name.">
+          <FormField id="publication-category" label="Category">
+            <select id="publication-category" value={draft.category} onChange={(event) => update('category', event.target.value)}>
+              <option value="">All categories</option>
+              {PUBLICATION_CATEGORIES.map((category) => (
+                <option key={category.value} value={category.value}>{category.label}</option>
+              ))}
+            </select>
+          </FormField>
+          <FormField id="publication-venue" label="Journal, conference, or server" hint="Matches category-specific publication source details.">
             <input id="publication-venue" value={draft.venue} onChange={(event) => update('venue', event.target.value)} />
           </FormField>
           <FormField id="publication-author" label="Author">
@@ -331,9 +359,10 @@ export function PublicationListPage() {
           <div className="card-list">
             {items.map((item) => (
               <article className="record-card" key={item.id}>
+                <p className="eyebrow">{categoryLabel(item.category)}</p>
                 <h2><Link to={`/publications/${item.id}`}>{item.title}</Link></h2>
                 <p className="person-meta">
-                  {[item.publicationYear, item.venue].filter(Boolean).join(' · ') || 'No year or venue listed'}
+                  {[item.publicationYear, publicationVenue(item)].filter(Boolean).join(' · ') || 'No year or source listed'}
                   {item.moderationStatus && item.moderationStatus !== 'approved' ? ` · ${item.moderationStatus}` : ''}
                 </p>
                 {item.authors?.length ? <p className="person-meta">{authorNames(item.authors)}</p> : null}

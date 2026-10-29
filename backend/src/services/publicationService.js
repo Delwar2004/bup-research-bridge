@@ -9,7 +9,9 @@ const {
   asInteger, asDate, asUuidArray, parseQueryUuid, parseQueryUuidList, parseOptionalText,
   parseQueryEnum, parseQueryBool, parseQueryInt, assertEmptyBody, likePattern,
 } = require('../validators/common');
-const { MODERATION } = require('../domain/constants');
+const {
+  MODERATION, PUBLICATION_CATEGORIES, REVIEW_TYPES, PUBLICATION_STATUSES,
+} = require('../domain/constants');
 const {
   assertActiveAreas, assertKnownAreas, assertAcademicProfiles, requireVisible,
   assertModerationCreate, assertSubmitTransition,
@@ -34,18 +36,101 @@ function parseAuthors(value) {
   });
 }
 
+function parseKeywords(value) {
+  if (!Array.isArray(value)) throw invalid('keywords', 'type', 'Must be an array.');
+  if (value.length > 25) throw invalid('keywords', 'length', 'At most 25 keywords are allowed.');
+  const keywords = value.map((keyword, index) => (
+    asTrimmedString(keyword, 'keywords', { min: 1, max: 100 })
+  ));
+  const normalized = keywords.map((keyword) => keyword.toLocaleLowerCase());
+  if (new Set(normalized).size !== keywords.length) {
+    throw invalid('keywords', 'duplicate', 'Keywords must be unique.');
+  }
+  return keywords;
+}
+
+function requireValue(record, field, message) {
+  const value = record[field];
+  if (value === undefined || value === null || value === '') {
+    throw invalid(field, 'required', message || 'This field is required.');
+  }
+}
+
+function assertHttpUrl(value) {
+  if (value == null) return;
+  let parsed;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw invalid('url', 'format', 'Must be a valid HTTP or HTTPS URL.');
+  }
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    throw invalid('url', 'format', 'Must be a valid HTTP or HTTPS URL.');
+  }
+}
+
+function assertCategoryFields(record) {
+  requireValue(record, 'category', 'Choose a publication category.');
+  requireValue(record, 'publicationYear', 'Publication year is required.');
+  if (!Array.isArray(record.authors) || record.authors.length === 0) {
+    throw invalid('authors', 'required', 'Add at least one author.');
+  }
+  assertHttpUrl(record.url);
+  if (record.category === 'journal_article') {
+    requireValue(record, 'journalName', 'Journal name is required for a journal article.');
+  }
+  if (record.category === 'conference_paper') {
+    requireValue(record, 'conferenceName', 'Conference name is required for a conference paper.');
+  }
+  if (record.category === 'review_survey') {
+    requireValue(record, 'reviewType', 'Review type is required for a review or survey paper.');
+  }
+  if (record.category === 'preprint') {
+    requireValue(record, 'preprintServer', 'Preprint server is required for a preprint.');
+    requireValue(record, 'url', 'URL is required for a preprint.');
+    requireValue(record, 'publicationStatus', 'Publication status is required for a preprint.');
+  }
+}
+
+const CATEGORY_FIELDS = {
+  journal_article: new Set(['journalName', 'volume', 'issue', 'pageRange']),
+  conference_paper: new Set(['conferenceName', 'proceedingsTitle', 'pageRange']),
+  review_survey: new Set(['reviewType', 'journalName', 'conferenceName', 'volume', 'issue', 'pageRange']),
+  preprint: new Set(['preprintServer', 'preprintId', 'version', 'publicationStatus']),
+};
+
+function rejectFieldsForCategory(parsed, category) {
+  const categorySpecific = new Set(Object.values(CATEGORY_FIELDS).flatMap((fields) => [...fields]));
+  const allowed = CATEGORY_FIELDS[category];
+  for (const field of Object.keys(parsed)) {
+    if (categorySpecific.has(field) && !allowed.has(field) && parsed[field] != null) {
+      throw invalid(field, 'not_allowed', `This field does not apply to ${category.replaceAll('_', ' ')}.`);
+    }
+  }
+  if (category === 'preprint' && parsed.publisher != null) {
+    throw invalid('publisher', 'not_allowed', 'Publisher does not apply to a preprint.');
+  }
+}
+
 function parseBody(body, { partial }) {
   const obj = assertObject(body);
   rejectUnknown(obj, [
-    'title', 'abstract', 'venue', 'publicationYear', 'doi', 'url', 'publishedOn',
+    'category', 'title', 'abstract', 'venue', 'publicationYear', 'journalName',
+    'conferenceName', 'proceedingsTitle', 'volume', 'issue', 'pageRange',
+    'publisher', 'keywords', 'reviewType', 'preprintServer', 'preprintId',
+    'version', 'publicationStatus', 'doi', 'url', 'publishedOn',
     'moderationStatus', 'researchAreaIds', 'authors',
   ]);
   if (partial && !Object.keys(obj).length) throw invalid('body', 'required', 'At least one field is required.');
+  if (!partial && obj.category === undefined) throw invalid('category', 'required', 'Choose a publication category.');
   if (!partial && obj.title === undefined) throw invalid('title', 'required', 'This field is required.');
+  if (!partial && obj.publicationYear === undefined) throw invalid('publicationYear', 'required', 'This field is required.');
+  if (!partial && obj.authors === undefined) throw invalid('authors', 'required', 'Add at least one author.');
   if (partial && obj.moderationStatus !== undefined) {
     throw invalid('moderationStatus', 'not_allowed', 'Use the submit or moderation endpoint for status changes.');
   }
   const parsed = {};
+  if (obj.category !== undefined) parsed.category = asEnum(obj.category, 'category', PUBLICATION_CATEGORIES);
   if (obj.title !== undefined) parsed.title = asTrimmedString(obj.title, 'title', { min: 1, max: 500 });
   if (obj.abstract !== undefined) parsed.abstract = asOptionalString(obj.abstract, 'abstract', { max: 20000, nullable: true });
   if (obj.venue !== undefined) parsed.venue = asOptionalString(obj.venue, 'venue', { max: 300, nullable: true });
@@ -53,6 +138,25 @@ function parseBody(body, { partial }) {
     parsed.publicationYear = obj.publicationYear === null
       ? null
       : asInteger(obj.publicationYear, 'publicationYear', { min: 1950, max: 2100 });
+  }
+  if (obj.journalName !== undefined) parsed.journalName = asOptionalString(obj.journalName, 'journalName', { max: 300, nullable: true });
+  if (obj.conferenceName !== undefined) parsed.conferenceName = asOptionalString(obj.conferenceName, 'conferenceName', { max: 300, nullable: true });
+  if (obj.proceedingsTitle !== undefined) parsed.proceedingsTitle = asOptionalString(obj.proceedingsTitle, 'proceedingsTitle', { max: 500, nullable: true });
+  if (obj.volume !== undefined) parsed.volume = asOptionalString(obj.volume, 'volume', { max: 100, nullable: true });
+  if (obj.issue !== undefined) parsed.issue = asOptionalString(obj.issue, 'issue', { max: 100, nullable: true });
+  if (obj.pageRange !== undefined) parsed.pageRange = asOptionalString(obj.pageRange, 'pageRange', { max: 100, nullable: true });
+  if (obj.publisher !== undefined) parsed.publisher = asOptionalString(obj.publisher, 'publisher', { max: 300, nullable: true });
+  if (obj.keywords !== undefined) parsed.keywords = parseKeywords(obj.keywords);
+  if (obj.reviewType !== undefined) {
+    parsed.reviewType = obj.reviewType === null ? null : asEnum(obj.reviewType, 'reviewType', REVIEW_TYPES);
+  }
+  if (obj.preprintServer !== undefined) parsed.preprintServer = asOptionalString(obj.preprintServer, 'preprintServer', { max: 200, nullable: true });
+  if (obj.preprintId !== undefined) parsed.preprintId = asOptionalString(obj.preprintId, 'preprintId', { max: 200, nullable: true });
+  if (obj.version !== undefined) parsed.version = asOptionalString(obj.version, 'version', { max: 100, nullable: true });
+  if (obj.publicationStatus !== undefined) {
+    parsed.publicationStatus = obj.publicationStatus === null
+      ? null
+      : asEnum(obj.publicationStatus, 'publicationStatus', PUBLICATION_STATUSES);
   }
   if (obj.doi !== undefined) parsed.doi = asOptionalString(obj.doi, 'doi', { max: 255, nullable: true });
   if (obj.url !== undefined) parsed.url = asOptionalString(obj.url, 'url', { max: 2000, nullable: true, trim: false });
@@ -66,16 +170,32 @@ function parseBody(body, { partial }) {
 async function create(user, body) {
   if (!['student', 'faculty', 'alumni', 'admin'].includes(user.role)) throw forbidden();
   const parsed = parseBody(body, { partial: false });
+  rejectFieldsForCategory(parsed, parsed.category);
+  assertCategoryFields(parsed);
   parsed.moderationStatus = assertModerationCreate(parsed.moderationStatus);
   const id = await withTransaction(async (db) => {
     await assertActiveAreas(db, parsed.researchAreaIds || []);
     if (parsed.authors) await assertAcademicProfiles(db, parsed.authors.map((a) => a.userId), 'authors');
     const createdId = await publicationRepository.insertPublication(db, {
       createdByUserId: user.id,
+      category: parsed.category,
       title: parsed.title,
       abstract: parsed.abstract ?? null,
       venue: parsed.venue ?? null,
       publicationYear: parsed.publicationYear ?? null,
+      journalName: parsed.journalName ?? null,
+      conferenceName: parsed.conferenceName ?? null,
+      proceedingsTitle: parsed.proceedingsTitle ?? null,
+      volume: parsed.volume ?? null,
+      issue: parsed.issue ?? null,
+      pageRange: parsed.pageRange ?? null,
+      publisher: parsed.publisher ?? null,
+      keywords: parsed.keywords ?? [],
+      reviewType: parsed.reviewType ?? null,
+      preprintServer: parsed.preprintServer ?? null,
+      preprintId: parsed.preprintId ?? null,
+      version: parsed.version ?? null,
+      publicationStatus: parsed.publicationStatus ?? null,
       doi: parsed.doi ?? null,
       url: parsed.url ?? null,
       publishedOn: parsed.publishedOn ?? null,
@@ -110,6 +230,7 @@ async function list(user, queryParams) {
     yearFrom,
     yearTo,
     venue: venue ? likePattern(venue) : undefined,
+    category: parseQueryEnum(queryParams.category, 'category', PUBLICATION_CATEGORIES),
     mineUserId: mine ? user.id : undefined,
     moderationStatus,
   };
@@ -137,6 +258,24 @@ async function update(user, id, body) {
   const isAdmin = user.role === 'admin';
   if (user.id !== existing.created_by_user_id && !isAdmin) throw forbidden();
   const parsed = parseBody(body, { partial: true });
+  if (existing.category && parsed.category && parsed.category !== existing.category) {
+    throw invalid('category', 'immutable', 'The category cannot be changed after the publication is created.');
+  }
+  const category = existing.category || parsed.category;
+  if (!category) throw invalid('category', 'required', 'Choose a publication category.');
+  rejectFieldsForCategory(parsed, category);
+  const combined = {
+    category,
+    publicationYear: parsed.publicationYear !== undefined ? parsed.publicationYear : existing.publication_year,
+    authors: parsed.authors !== undefined ? parsed.authors : existing.authors,
+    journalName: parsed.journalName !== undefined ? parsed.journalName : existing.journal_name,
+    conferenceName: parsed.conferenceName !== undefined ? parsed.conferenceName : existing.conference_name,
+    reviewType: parsed.reviewType !== undefined ? parsed.reviewType : existing.review_type,
+    preprintServer: parsed.preprintServer !== undefined ? parsed.preprintServer : existing.preprint_server,
+    publicationStatus: parsed.publicationStatus !== undefined ? parsed.publicationStatus : existing.publication_status,
+    url: parsed.url !== undefined ? parsed.url : existing.url,
+  };
+  assertCategoryFields(combined);
   if (existing.moderation_status === 'approved') {
     if (parsed.researchAreaIds && parsed.researchAreaIds.length === 0) {
       throw invalid('researchAreaIds', 'required', 'An approved publication must keep at least one research area.');
@@ -169,6 +308,17 @@ async function submit(user, id, body) {
   const existing = await publicationRepository.findById({ query }, id);
   requireVisible(user, existing, [existing && existing.created_by_user_id]);
   if (user.id !== existing.created_by_user_id) throw forbidden();
+  assertCategoryFields({
+    category: existing.category,
+    publicationYear: existing.publication_year,
+    authors: existing.authors,
+    journalName: existing.journal_name,
+    conferenceName: existing.conference_name,
+    reviewType: existing.review_type,
+    preprintServer: existing.preprint_server,
+    publicationStatus: existing.publication_status,
+    url: existing.url,
+  });
   assertSubmitTransition(existing.moderation_status);
   await publicationRepository.updatePublication({ query }, id, { moderationStatus: 'pending' });
   return toPublication(await publicationRepository.findById({ query }, id));
@@ -195,4 +345,4 @@ async function remove(user, id) {
   return { id };
 }
 
-module.exports = { create, list, get, update, submit, remove };
+module.exports = { create, list, get, update, submit, remove, assertCategoryFields };

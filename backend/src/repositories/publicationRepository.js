@@ -4,10 +4,24 @@ const PUB_SELECT = `
 SELECT
   p.id,
   p.created_by_user_id,
+  p.category,
   p.title,
   p.abstract,
   p.venue,
   p.publication_year,
+  p.journal_name,
+  p.conference_name,
+  p.proceedings_title,
+  p.volume,
+  p.issue,
+  p.page_range,
+  p.publisher,
+  p.keywords,
+  p.review_type,
+  p.preprint_server,
+  p.preprint_id,
+  p.version,
+  p.publication_status,
   p.doi,
   p.url,
   p.published_on,
@@ -40,15 +54,34 @@ JOIN users creator ON creator.id = p.created_by_user_id
 async function insertPublication(db, row) {
   const { rows } = await db.query(
     `INSERT INTO publications (
-       created_by_user_id, title, abstract, venue, publication_year, doi, url, published_on, moderation_status
-     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       created_by_user_id, category, title, abstract, venue, publication_year,
+       journal_name, conference_name, proceedings_title, volume, issue, page_range,
+       publisher, keywords, review_type, preprint_server, preprint_id, version,
+       publication_status, doi, url, published_on, moderation_status
+     ) VALUES (
+       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23
+     )
      RETURNING id`,
     [
       row.createdByUserId,
+      row.category,
       row.title,
       row.abstract,
       row.venue,
       row.publicationYear,
+      row.journalName,
+      row.conferenceName,
+      row.proceedingsTitle,
+      row.volume,
+      row.issue,
+      row.pageRange,
+      row.publisher,
+      row.keywords,
+      row.reviewType,
+      row.preprintServer,
+      row.preprintId,
+      row.version,
+      row.publicationStatus,
       row.doi,
       row.url,
       row.publishedOn,
@@ -96,7 +129,19 @@ function buildFilters(filters) {
   }
   if (filters.yearFrom != null) add(`p.publication_year >= $?`, filters.yearFrom);
   if (filters.yearTo != null) add(`p.publication_year <= $?`, filters.yearTo);
-  if (filters.venue) add(`p.venue ILIKE $? ESCAPE '\\'`, filters.venue);
+  if (filters.venue) {
+    params.push(filters.venue);
+    const ref = `$${params.length}`;
+    clauses.push(`(
+      p.venue ILIKE ${ref} ESCAPE '\\'
+      OR p.journal_name ILIKE ${ref} ESCAPE '\\'
+      OR p.conference_name ILIKE ${ref} ESCAPE '\\'
+      OR p.proceedings_title ILIKE ${ref} ESCAPE '\\'
+      OR p.publisher ILIKE ${ref} ESCAPE '\\'
+      OR p.preprint_server ILIKE ${ref} ESCAPE '\\'
+    )`);
+  }
+  if (filters.category) add(`p.category = $?`, filters.category);
   if (filters.mineUserId) add(`p.created_by_user_id = $?`, filters.mineUserId);
   if (filters.moderationStatus) add(`p.moderation_status = $?`, filters.moderationStatus);
   if (filters.areaIds && filters.areaIds.length) {
@@ -139,9 +184,23 @@ async function updatePublication(db, id, fields) {
     sets.push(`${column} = $${params.length}`);
   };
   if (fields.title !== undefined) push('title', fields.title);
+  if (fields.category !== undefined) push('category', fields.category);
   if (fields.abstract !== undefined) push('abstract', fields.abstract);
   if (fields.venue !== undefined) push('venue', fields.venue);
   if (fields.publicationYear !== undefined) push('publication_year', fields.publicationYear);
+  if (fields.journalName !== undefined) push('journal_name', fields.journalName);
+  if (fields.conferenceName !== undefined) push('conference_name', fields.conferenceName);
+  if (fields.proceedingsTitle !== undefined) push('proceedings_title', fields.proceedingsTitle);
+  if (fields.volume !== undefined) push('volume', fields.volume);
+  if (fields.issue !== undefined) push('issue', fields.issue);
+  if (fields.pageRange !== undefined) push('page_range', fields.pageRange);
+  if (fields.publisher !== undefined) push('publisher', fields.publisher);
+  if (fields.keywords !== undefined) push('keywords', fields.keywords);
+  if (fields.reviewType !== undefined) push('review_type', fields.reviewType);
+  if (fields.preprintServer !== undefined) push('preprint_server', fields.preprintServer);
+  if (fields.preprintId !== undefined) push('preprint_id', fields.preprintId);
+  if (fields.version !== undefined) push('version', fields.version);
+  if (fields.publicationStatus !== undefined) push('publication_status', fields.publicationStatus);
   if (fields.doi !== undefined) push('doi', fields.doi);
   if (fields.url !== undefined) push('url', fields.url);
   if (fields.publishedOn !== undefined) push('published_on', fields.publishedOn);
