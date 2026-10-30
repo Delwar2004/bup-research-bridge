@@ -9,6 +9,7 @@
     "migrate": "node scripts/migrate.js",
     "create-admin": "node scripts/create-admin.js",
     "import:nazneen": "node scripts/import-nazneen.js",
+    "import:suman": "node scripts/import-suman.js",
     "test": "node --test --test-concurrency=1 tests/*.test.js"
   },
   "engines": {

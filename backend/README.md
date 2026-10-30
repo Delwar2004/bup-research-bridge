@@ -26,10 +26,11 @@ ADMIN_FULL_NAME="Platform Admin" ADMIN_EMAIL="admin@bup.edu.bd" ADMIN_PASSWORD="
 
 ### Faculty publication import
 
-The repository includes a reviewed import for Nazneen Akhter's faculty profile and ten publications. Run it after migrations:
+The repository includes reviewed imports for faculty profiles and ten publications per profile. Run them after migrations:
 
 ```bash
 FACULTY_INITIAL_PASSWORD="choose-a-temporary-password" npm run import:nazneen
+FACULTY_INITIAL_PASSWORD="choose-a-temporary-password" npm run import:suman
 ```
 
 `FACULTY_INITIAL_PASSWORD` is required only when the account does not exist. It is hashed before storage and must never be committed. Re-running the command updates the same profile and DOI records instead of creating duplicates.
