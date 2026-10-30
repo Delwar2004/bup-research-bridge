@@ -124,6 +124,10 @@ export function MentorshipDetailPage() {
 
   async function sendMessage(event) {
     event.preventDefault();
+    if (item.status !== 'accepted') {
+      setMessageError('Messages can be sent only while the mentorship request is accepted.');
+      return;
+    }
     const text = draft.trim();
     if (!text || text.length > 10000) {
       setFieldErrors({ body: 'Message is required and must be at most 10000 characters.' });
@@ -243,12 +247,20 @@ export function MentorshipDetailPage() {
           </ol>
         ) : null}
         <Pagination page={messageMeta?.page || 1} totalPages={messageMeta?.totalPages || 0} onPage={setMessagePage} />
-        <form onSubmit={sendMessage} noValidate>
-          <FormField id="message-body" label="Write a message" error={fieldErrors.body}>
-            <textarea id="message-body" rows="4" value={draft} onChange={(event) => setDraft(event.target.value)} />
-          </FormField>
-          <button className="button" type="submit" disabled={sending}>{sending ? 'Sending…' : 'Send message'}</button>
-        </form>
+        {item.status === 'accepted' ? (
+          <form onSubmit={sendMessage} noValidate>
+            <FormField id="message-body" label="Write a message" error={fieldErrors.body}>
+              <textarea id="message-body" rows="4" value={draft} onChange={(event) => setDraft(event.target.value)} />
+            </FormField>
+            <button className="button" type="submit" disabled={sending}>{sending ? 'Sending…' : 'Send message'}</button>
+          </form>
+        ) : (
+          <p className="empty-state">
+            {item.status === 'pending'
+              ? 'Messaging will become available after the mentor accepts this request.'
+              : 'This conversation is closed. Previous messages remain available to read.'}
+          </p>
+        )}
       </section>
     </article>
   );
