@@ -1940,7 +1940,7 @@ Success `200`: message array and `meta`.
 
 Errors: `404` when the request is not visible to the caller.
 
-The database allows a message in any request status. This API does the same. It does not add a status gate the schema does not have.
+The student and mentor can read existing messages regardless of request status. Closing a request does not remove its conversation history.
 
 #### MEN-06 Create message
 
@@ -1955,9 +1955,9 @@ The database allows a message in any request status. This API does the same. It 
 
 Body: `{ "body": "string" }` required, trimmed 1–10000.
 
-Success `201`: message object.
+Success `201`: message object. New messages can be created only while the request status is `accepted`. The student's initial message is still inserted when the mentorship request is created.
 
-Errors: `404` request not visible. `422` empty body or sender is not a party (the trigger raises in that case; the API should prevent it by the `404` rule first).
+Errors: `404` request not visible. `409` when the request status is not `accepted`. `422` empty body or sender is not a party (the trigger raises in that case; the API should prevent it by the `404` rule first).
 
 Transaction: insert message and notify the other party with type `message_received`, `mentorship_request_id` set, `payload` `{ "requestId", "messageId" }`. The notification `message` is a short sentence. It does not need to copy the full body. Do not put the body in `payload` if it would duplicate private content into a second table beyond the message row; `payload` carries ids only.
 

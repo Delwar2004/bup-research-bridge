@@ -136,6 +136,9 @@ async function listMessages(user, id, queryParams) {
 async function createMessage(user, id, body) {
   const raw = await mentorshipRepository.findRaw({ query }, id);
   if (!raw || !sideOf(user, raw)) throw notFound();
+  if (raw.status !== 'accepted') {
+    throw conflict('Messages can be sent only while the mentorship request is accepted.');
+  }
   const obj = assertObject(body);
   rejectUnknown(obj, ['body']);
   if (obj.body === undefined) throw invalid('body', 'required', 'This field is required.');

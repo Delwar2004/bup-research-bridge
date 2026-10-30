@@ -235,6 +235,12 @@ test('faculty opportunity, approval notifications, and mentorship', async () => 
     });
   assert.equal(duplicate.status, 409);
 
+  const pendingReply = await request(app)
+    .post(`/api/v1/mentorship-requests/${requestRow.body.data.id}/messages`)
+    .set('Authorization', `Bearer ${facultyToken}`)
+    .send({ body: 'This reply should wait until acceptance.' });
+  assert.equal(pendingReply.status, 409);
+
   const accepted = await request(app)
     .patch(`/api/v1/mentorship-requests/${requestRow.body.data.id}`)
     .set('Authorization', `Bearer ${facultyToken}`)
@@ -252,6 +258,28 @@ test('faculty opportunity, approval notifications, and mentorship', async () => 
     .set('Authorization', `Bearer ${facultyToken}`)
     .send({ body: 'Welcome to the project.' });
   assert.equal(reply.status, 201);
+
+  const completed = await request(app)
+    .patch(`/api/v1/mentorship-requests/${requestRow.body.data.id}`)
+    .set('Authorization', `Bearer ${facultyToken}`)
+    .send({ status: 'completed' });
+  assert.equal(completed.status, 200);
+  assert.equal(completed.body.data.status, 'completed');
+
+  const completedReply = await request(app)
+    .post(`/api/v1/mentorship-requests/${requestRow.body.data.id}/messages`)
+    .set('Authorization', `Bearer ${studentToken}`)
+    .send({ body: 'This reply should not be stored.' });
+  assert.equal(completedReply.status, 409);
+
+  const completedMessages = await request(app)
+    .get(`/api/v1/mentorship-requests/${requestRow.body.data.id}/messages`)
+    .set('Authorization', `Bearer ${studentToken}`);
+  assert.equal(completedMessages.status, 200);
+  assert.deepEqual(
+    completedMessages.body.data.map((message) => message.body),
+    ['I would like to work on this topic.', 'Welcome to the project.'],
+  );
 
   const studentNotes = await request(app)
     .get('/api/v1/notifications')
